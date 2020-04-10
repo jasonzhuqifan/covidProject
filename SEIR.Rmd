@@ -1,0 +1,48 @@
+---
+title: "440ProjectFinalReport"
+output: pdf_document
+---
+
+Canada data
+```{r}
+data.confirmed <- read.csv("time_series_covid19_confirmed_global.csv", sep=",", header = TRUE)
+data.confirmed.canada <- data.confirmed[data.confirmed[,"Country.Region"]=="Canada",]
+data.confirmed.test <- colSums(data.confirmed.canada[,(ncol(data.confirmed.canada)-34):ncol(data.confirmed.canada)])
+data.confirmed.train <- colSums(data.confirmed.canada[,(ncol(data.confirmed.canada)-24):ncol(data.confirmed.canada)-10])
+
+data.recovered <- read.csv("time_series_covid19_recovered_global.csv", sep=",", header = TRUE)
+data.recovered.canada <- data.recovered[data.recovered[,"Country.Region"]=="Canada",]
+data.recovered.test <- colSums(data.recovered.canada[,(ncol(data.recovered.canada)-34):ncol(data.recovered.canada)])
+data.recovered.train <- colSums(data.recovered.canada[,(ncol(data.recovered.canada)-24):ncol(data.recovered.canada)-10])
+
+data.death <- read.csv("time_series_covid19_deaths_global.csv", sep=",", header = TRUE)
+data.death.canada <- data.death[data.death[,"Country.Region"]=="Canada",]
+data.death.test <- colSums(data.death.canada[,(ncol(data.death.canada)-34):ncol(data.death.canada)])
+data.death.train <- colSums(data.death.canada[,(ncol(data.death.canada)-24):ncol(data.death.canada)-10])
+```
+
+```{r}
+library(reticulate)
+require(coronaModel)
+os <- import("os")
+os$listdir(".")
+use_python("/usr/local/bin/python3.7")
+
+source_python('seir_main.py')
+res <- searchBestParam(30000000, 1100, data.confirmed.train, data.death.train, data.recovered.train) #init S, range of init E, confirmed data, death data, recovered data
+param <- res[1][[1]]
+E <- res[2][[1]]
+I <- data.confirmed.train[1]
+D <- data.death.train[1]
+C <- data.recovered.train[1]
+a1 = param$alpha1
+a2 = param$alpha2
+b = param$beta
+s = param$sigma
+g = param$gamma
+
+pred <- sier_predict(35,a1,a2,b,s,g,E, I, D, C)
+data <- list(I=data.confirmed.test, D=data.death.test, C=data.recovered.test)
+sier_plot(pred, data)
+```
+

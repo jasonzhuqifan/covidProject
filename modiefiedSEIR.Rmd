@@ -1,0 +1,142 @@
+---
+title: "440ProjectFinalReport"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+3.1 SEIR model
+```{r}
+c = 2.6 # contact rate
+beta = 1.74e-9 # transmission probability
+q = 10e-7 # the proportion of the individuals exposed to the virus and is notified and quarantined
+S = 5917*1e4 # Susceptible
+I = 524 * 1.5 # unisoldated infected people 
+theta = 1 # probability of having symptoms among infected individuals
+E = 4007 # Exposed
+lambda = 1/14
+Sq = 2776
+sigma = 1/7
+T = 40
+t = 0.01
+delta_I0 = 0.13
+delta_q=0.13
+Eq=400
+H=I+Eq
+gama_H=0.007
+gama_I=0.0035
+alpha=0.0001
+R=31
+N = T/t
+
+mat<-matrix(0, nrow=N, ncol=7)
+for(i in 1:N) {
+  if ((i*t) >= 14){
+    delta_I = delta_I0 * 1.2
+  } else {
+    delta_I = delta_I0
+  }
+  dS <- -(c * beta + c * q * (1- beta)) * S * (I + theta * E) + lambda * Sq
+  dE <- beta*c*(1-q)*S*(I+theta*E)-sigma*E
+  dI <- sigma*E-(delta_I+alpha+gama_I)*I
+  dSq = (1-beta)*c*q*S*(I+theta*E)-lambda*Sq
+  dEq = beta*c*q*S*(I+theta*E)-delta_q*Eq
+  dH = delta_I*I+delta_q*Eq-(alpha+gama_H)*H
+  dR = gama_I*I+gama_H*H
+  
+  S =S+dS*t
+  E = E+dE*t
+  I = I+dI*t
+  Sq = Sq+dSq*t
+  Eq = Eq+dEq*t
+  H = H+dH*t
+  R = R+dR*t
+  AA = c(S, E, I , Sq, Eq, H, R)
+  mat[i,1:7] = AA
+}
+
+infected = c()
+cured = c()
+j = 1
+for(i in seq(1, nrow(mat), 1/t)) {
+  infected[j] = round(mat[i,3])
+  cured[j] = round(mat[i,7])
+  j = j + 1
+}
+
+data_Infected=c(524,658,958,1303,2567,3349,4334,5486,6738,8565,10532,12712,15679,18445,20677,23139,24881,26965,28532,29659)
+data_Cured= c(31,32,42,44,47,80,90,116,166,215,295,396,520,671,817,1115,1439,1795,2222,2639)
+infected
+cured
+
+plot(infected, type="l", col="red", 
+     ylab = "Number of People", xlab = "Iterations")
+lines(cured, col="blue")
+points(data_Infected, col="black")
+points(data_Cured, col="black")
+legend("topright", c("Infected","Cured"), pch = "-", col = c("red", "blue"))
+
+```
+
+Canada data
+```{r}
+data.confirmed <- read.table("time_series_covid19_confirmed_global.csv", sep=",", header = TRUE)
+data.confirmed.canada <- data.confirmed[data.confirmed[,"Country.Region"]=="Canada",]
+data.confirmed.canada <- colSums(data.confirmed.canada[,52:ncol(data.confirmed.canada)])
+
+data.recovered <- read.table("time_series_covid19_recovered_global.csv", sep=",", header = TRUE)
+data.revocered.canada <- data.recovered[data.recovered[,"Country.Region"]=="Canada",]
+data.revocered.canada <- colSums(data.revocered.canada[,52:ncol(data.revocered.canada)])
+
+S = 37658947
+E = 300
+I = 77 * 1.5 # consider there are missing cases
+Sq = 150 #estimate
+Eq = 30 #estimate
+H = I + Eq
+R = 8
+
+mat<-matrix(0, nrow=N, ncol=7)
+for(i in 1:N) {
+  if ((i*t) >= 14){
+    delta_I = delta_I0 * 1.2
+  } else {
+    delta_I = delta_I0
+  }
+  dS <- -(c * beta + c * q * (1- beta)) * S * (I + theta * E) + lambda * Sq
+  dE <- beta*c*(1-q)*S*(I+theta*E)-sigma*E
+  dI <- sigma*E-(delta_I+alpha+gama_I)*I
+  dSq = (1-beta)*c*q*S*(I+theta*E)-lambda*Sq
+  dEq = beta*c*q*S*(I+theta*E)-delta_q*Eq
+  dH = delta_I*I+delta_q*Eq-(alpha+gama_H)*H
+  dR = gama_I*I+gama_H*H
+  
+  S =S+dS*t
+  E = E+dE*t
+  I = I+dI*t
+  Sq = Sq+dSq*t
+  Eq = Eq+dEq*t
+  H = H+dH*t
+  R = R+dR*t
+  AA = c(S, E, I , Sq, Eq, H, R)
+  mat[i,1:7] = AA
+}
+
+infected = c()
+cured = c()
+j = 1
+for(i in seq(1, nrow(mat), 1/t)) {
+  infected[j] = round(mat[i,3])
+  cured[j] = round(mat[i,7])
+  j = j + 1
+}
+
+plot(infected, type="l", col="red", 
+     ylab = "Number of People", xlab = "Iterations")
+lines(cured, col="blue")
+points(data.confirmed.canada, col="black")
+points(data.revocered.canada, col="black")
+legend("topright", c("Infected","Cured"), pch = "-", col = c("red", "blue"))
+
+```
