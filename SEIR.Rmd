@@ -22,12 +22,13 @@ data.death.train <- colSums(data.death.canada[,(ncol(data.death.canada)-24):ncol
 ```
 
 ```{r}
+# installation of usethis, devtools and roxygen2 are required. i.e. install.pacakages("devtools")
 library(reticulate)
 require(coronaModel)
 os <- import("os")
 os$listdir(".")
 use_python("/usr/local/bin/python3.7")
-
+py_install("scipy")
 source_python('seir_main.py')
 res <- searchBestParam(30000000, 1100, data.confirmed.train, data.death.train, data.recovered.train) #init S, range of init E, confirmed data, death data, recovered data
 param <- res[1][[1]]
