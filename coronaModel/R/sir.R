@@ -9,12 +9,12 @@ library("deSolve")
 #' @param upper_b value of alpha1, the infectious rate by exposed people.
 #' @return The prediction i.e. confirmed, death, recovered based on the params for pred_days `(I, D, C)`
 #' @export
-sir_mle_param <- function(init_b, init_g, lower_g, upper_g, upper_b){
+sir_mle_param <- function(init_b, init_g, lower_g, upper_g, upper_b, confirmed){
   ll.pois <- function(theta, yi) {
     logl = 0
-    for (i in length(confirmed$Date)) {
-      yi <- rpois(1,lambda = confirmed$Total[i])
-      logl <- logl + (yi * log(confirmed$Total[i]) - confirmed$Total[i])
+    for (i in length(confirmed)) {
+      yi <- rpois(1,lambda = confirmed[i])
+      logl <- logl + (yi * log(confirmed[i]) - confirmed[i])
     }
     logl
   }
@@ -73,11 +73,11 @@ sir_fit <- function(pred_days, beta, gamma, S, I, R, N){
   pred.S <- c(S)
   pred.I <- c(I)
   pred.R <- c(R)
-  
-  for (i in 2:pred_days) {     
+
+  for (i in 2:pred_days) {
     S_ <- S - beta * S * I / N
     R_ <- R + gamma * I
-    I_ <- N - S_ - R_ 
+    I_ <- N - S_ - R_
     S <- S_
     I <- I_
     R <- R_
@@ -97,14 +97,14 @@ sir_plot <- function(pred, data){
   if (!is.null(pred$I) && !is.null(data$I)) {
     plot(pred$I, type="l", main="Infected", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$I,data$I)))
     points(data$I, col="black")
-    
+
     plot(pred_ode[,3],type="l", main="Infected - Mu", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$I,data$I)))
     points(data$I, col="black")}
-  
+
   if (!is.null(pred$R) && !is.null(data$R)) {
     plot(pred$R, type="l", main="Removed", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$R,data$R)))
     points(data$R, col="black")
-    
+
     plot(pred_ode[,3],type="l", main="Removed - Mu", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$R,data$R)))
     points(data$R, col="black")}
 }

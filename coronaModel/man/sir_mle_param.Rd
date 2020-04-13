@@ -4,12 +4,18 @@
 \alias{sir_mle_param}
 \title{Maximize the log-likelihood function and compute initial estimates of beta and gamma}
 \usage{
-sir_mle_param(init_b, init_g, lower_g, upper_g, upper_b)
+sir_mle_param(init_b, init_g, lower_g, upper_g, upper_b, confirmed)
 }
 \arguments{
 \item{init_b}{number of days we want to predict for.}
 
 \item{init_g}{value of alpha1, the infectious rate by exposed people.}
+
+\item{lower_g}{value of alpha1, the infectious rate by exposed people.}
+
+\item{upper_g}{value of alpha1, the infectious rate by exposed people.}
+
+\item{upper_b}{value of alpha1, the infectious rate by exposed people.}
 }
 \value{
 The prediction i.e. confirmed, death, recovered based on the params for pred_days \verb{(I, D, C)}
