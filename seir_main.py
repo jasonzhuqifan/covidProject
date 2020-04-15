@@ -27,7 +27,6 @@ class SEIR(object):
 	def logloss(self, obs, est):
 		assert len(obs) == len(est)
 		loss = ((np.log2(obs + 1) - np.log2(est + 1)) ** 2).sum()
-		self.lossing.append(loss)
 		return loss
 
 	# Metric function that computes the r2 score of real data and predicted data.
@@ -41,7 +40,7 @@ class SEIR(object):
 															  dtype=np.float64)
 		return 1 - numerator / denominator
 
-	# Helper function that returns a list of data as a form of [confirmed, death, recovered]
+	# Helper function that returns a list of data as a form of [confirmed, death, recovered].
 	# Input: data  -  a list of three lists containing confirmed data, death data and recovered data in each list.
 	def get_IDC(self, data):
 		res = []
@@ -56,13 +55,12 @@ class SEIR(object):
 
 	# Fit the input data and find the best parameters with optimized function defined above
 	def fit(self, initS, initE, initI, initD, initC, Y):
-		self.lossing = []
 		args = (initS, initE, initI, initD, initC, np.asarray(Y))
 		param = [(0, 1), ] * 5
 		result = dual_annealing(self.opt_fn, param, args=args, seed=30, maxiter=10)['x']
 		self.P = SEIR_PARAM(*result)
 
-	# Convert rows data to three-column data (confirmed, death, recovered)
+	# Convert rows data to three-column data (confirmed, death, recovered).
 	def get_column_data(self, rows):
 		col1 = []
 		col2 = []
@@ -73,9 +71,9 @@ class SEIR(object):
 			col3.append(rows[i][2])
 		return col1, col2, col3
 
-	# Computer log loss and average r2 score
-	def score(self, initS, initE, initI, initD, initC, Y):
-		est = self.get_IDC(self.predict(initS, initE, initI, initD, initC, len(Y)))
+	# Computer log loss and average r2 score.
+	def score(self, init_S, init_E, init_I, init_D, init_C, Y):
+		est = self.get_IDC(self.predict(init_S, init_E, init_I, init_D, init_C, len(Y)))
 		loss = self.logloss(np.asarray(Y), np.asarray(est))
 
 		y1, y2, y3 = self.get_column_data(Y)
@@ -86,27 +84,26 @@ class SEIR(object):
 
 		return loss, (r1 + r2 + r3) / 3
 
-	# Make predictions for T days with initial values
-	def predict(self, initS, initE, initI, initD, initC, T):
-		return self.forward(initS, initE, initI, initD, initC, self.P, T)
+	# Make predictions for T days with initial values.
+	def predict(self, init_S, init_E, init_I, init_D, init_C, T):
+		return self.forward(init_S, init_E, init_I, init_D, init_C, self.P, T)
 
-# Convert training data as column form
+# Convert training data as column form.
 def get_train_data(confirmed_data, death_data, recovered_data):
 	train = []
 	for i in range(len(confirmed_data)):
 		train.append([confirmed_data[i], death_data[i], recovered_data[i]])
 	return train
 
-# Main function that finds the best params (alpha1, alpha2, beta, sigma, gamma) and optimal initial E
-def searchBestParam(init_S, init_E, confirmed, death, recovered):
+# Main function that finds the best params (alpha1, alpha2, beta, sigma, gamma) and optimal initial E.
+def search_param(init_S, init_E, step, confirmed, death, recovered):
 	seir = SEIR()
 	train = get_train_data(confirmed, death, recovered)
 	min_loss, max_r2, best_param, likeli_potential = float('inf'), float('-inf'), None, 0
-	for potential in range(0, int(init_E), 25):
+	for potential in range(0, int(init_E), int(step)):
 		seir.fit(int(init_S), potential, train[0][0], train[0][1], train[0][2], train)
 		loss, r2 = seir.score(int(init_S), potential, train[0][0], train[0][1],  train[0][2], Y=train)
 		if loss < min_loss and r2 > max_r2:
-		#if loss < min_loss:
 			min_loss, max_r2, best_param, likeli_potential = loss, r2, seir.P, potential
 	seir.P = best_param
 	return best_param, likeli_potential

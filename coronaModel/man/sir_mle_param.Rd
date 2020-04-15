@@ -16,6 +16,8 @@ sir_mle_param(init_b, init_g, lower_g, upper_g, upper_b, confirmed)
 \item{upper_g}{value of alpha1, the infectious rate by exposed people.}
 
 \item{upper_b}{value of alpha1, the infectious rate by exposed people.}
+
+\item{confirmed}{value of alpha1, the infectious rate by exposed people.}
 }
 \value{
 The prediction i.e. confirmed, death, recovered based on the params for pred_days \verb{(I, D, C)}

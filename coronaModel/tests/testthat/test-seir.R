@@ -26,7 +26,7 @@ test_that("`seir_fit()` returns the same length for each prediction as pred_days
     D <- D_testcases[ii]
     C <- C_testcases[ii]
 
-    pred <- seir_fit(pred_days, a1, a2, b, s, g, E, I, D, C)
+    pred <- seird_m_fit(pred_days, a1, a2, b, s, g, E, I, D, C)
     # checks that the predicted length equals to pred_days
     expect_equal(length(pred$I), pred_days)
     expect_equal(length(pred$D), pred_days)

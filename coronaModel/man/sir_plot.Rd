@@ -4,10 +4,12 @@
 \alias{sir_plot}
 \title{Calculate quantile regerssion loss}
 \usage{
-sir_plot(pred, data)
+sir_plot(pred, pred_ode, data)
 }
 \arguments{
 \item{pred}{contact rate}
+
+\item{pred_ode}{contact rate}
 
 \item{data}{removed rate}
 }

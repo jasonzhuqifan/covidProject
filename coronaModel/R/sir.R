@@ -1,13 +1,13 @@
-library("deSolve")
-
 #' Maximize the log-likelihood function and compute initial estimates of beta and gamma
 #'
-#' @param init_b number of days we want to predict for.
-#' @param init_g value of alpha1, the infectious rate by exposed people.
-#' @param lower_g value of alpha1, the infectious rate by exposed people.
-#' @param upper_g value of alpha1, the infectious rate by exposed people.
-#' @param upper_b value of alpha1, the infectious rate by exposed people.
-#' @return The prediction i.e. confirmed, death, recovered based on the params for pred_days `(I, D, C)`
+#' @param init_b Inital guess value of beta.
+#' @param init_g Inital guess value of gamma.
+#' @param lower_g The lower bound of gamma when using mle to optimize gamma.
+#' @param upper_g The upper bound of gamma when using mle to optimize gamma.
+#' @param upper_b The upper bound of beta when using mle to optimize beta.
+#' @param confirmed A list of number of confirmed cases of real data `(day_1, ..., day_N)`.
+#' @details The poison...... TBD.
+#' @return The estimated parameter beta and gamma within the limit of bound values `(beta, gamma)`.
 #' @export
 sir_mle_param <- function(init_b, init_g, lower_g, upper_g, upper_b, confirmed){
   ll.pois <- function(theta, yi) {
@@ -32,15 +32,22 @@ sir_mle_param <- function(init_b, init_g, lower_g, upper_g, upper_b, confirmed){
   return(opt_param)
 }
 
-#' Define a helper function to enforce additional constraints on beta and gamma so that
-#' the optimal parameters will be computed until they meet the requirements
+#' Fit the SIR model using ODE to find the prediction values for susceptible, infected and removed cases
+#' for a period of time, given gamma, beta and initial values of populations.
 #'
-#' @param opt_param number of days we want to predict for.
-#' @param N value of alpha1, the infectious rate by exposed people.
-#' @param init_S value of alpha1, the infectious rate by exposed people.
-#' @param init_I value of alpha1, the infectious rate by exposed people.
-#' @param init_R value of alpha1, the infectious rate by exposed people.
-#' @return The prediction i.e. confirmed, death, recovered based on the params for pred_days `(I, D, C)`
+#' @param opt_param The estimated parameter beta and gamma within the limit of bound values `(beta, gamma)`.
+#' @param times A vector from 1 to the number of day we want to fit `(1, 2, ..., N)`.
+#' @param N The value of otal population.
+#' @param init_S The value of initial susceptible people.
+#' @param init_I The value of initial infected people.
+#' @param init_R The value of initial removed people.
+#' @details The reparametrized SIR model is
+#' ```
+#' S_new = S_old - beta * S_old * I_old / N
+#' I_new = I_old + beta * S_old * I_old / N - gamma * I_old
+#' R_new = R_old + gamma * I_old
+#' ```
+#' @return The prediction i.e. susceptible, infected, removed `(S, I, C)`.
 #' @export
 sir_ode_fit <- function(opt_param, times, N, init_S, init_I, init_R){
   # define the ODE for SIR model
@@ -57,16 +64,21 @@ sir_ode_fit <- function(opt_param, times, N, init_S, init_I, init_R){
   res
 }
 
-#' Define a helper function to enforce additional constraints on beta and gamma so that
-#' the optimal parameters will be computed until they meet the requirements
+#' Fit SIR model using an iteration approach
 #'
-#' @param pred_days number of days we want to predict for.
-#' @param beta value of alpha1, the infectious rate by exposed people.
-#' @param gamma value of alpha1, the infectious rate by exposed people.
-#' @param S value of alpha1, the infectious rate by exposed people.
-#' @param I value of alpha1, the infectious rate by exposed people.
-#' @param R value of alpha1, the infectious rate by exposed people.
-#' @param N value of alpha1, the infectious rate by exposed people.
+#' @param pred_days Number of days we want to predict for.
+#' @param beta Value of beta, the rate of transition from susceptible to infected.
+#' @param gamma Value of gamma, the rate of transition from infected to removed.
+#' @param S Initial number of susceptible people.
+#' @param I Initial number of confirmed infected people.
+#' @param R Initial number of removed cases.
+#' @param N Total population.
+#' @details The reparametrized SEIRD modified model is
+#' ```
+#' S_new = S_old - beta * S_old * I_old / N
+#' I_new = I_old + beta * S_old * I_old / N - gamma * I_old
+#' R_new = R_old + gamma * I_old
+#' ```
 #' @return The prediction i.e. confirmed, death, recovered based on the params for pred_days `(I, D, C)`
 #' @export
 sir_fit <- function(pred_days, beta, gamma, S, I, R, N){
@@ -88,12 +100,14 @@ sir_fit <- function(pred_days, beta, gamma, S, I, R, N){
   list(S=pred.S, I=pred.I, R=pred.R)
 }
 
-#' Calculate quantile regerssion loss
+#' Plot SIR models on confirmed cases and removed cases.
 #'
-#' @param pred contact rate
-#' @param data removed rate
+#' @param pred Prediction values of confirmed cases and removed cases. `(I, R)`.
+#' @param data True values of confirmed cases and removed cases. `(I, R)`.
+#' @details Plot the models of infection and removed cases seperately with prediction and real data.
+#' @return Two plots of infection cases and cremoved cases respectively.
 #' @export
-sir_plot <- function(pred, data){
+sir_plot <- function(pred, pred_ode, data){
   if (!is.null(pred$I) && !is.null(data$I)) {
     plot(pred$I, type="l", main="Infected", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$I,data$I)))
     points(data$I, col="black")

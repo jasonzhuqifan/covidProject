@@ -10,6 +10,8 @@ sir_ode_fit(opt_param, times, N, init_S, init_I, init_R)
 \arguments{
 \item{opt_param}{number of days we want to predict for.}
 
+\item{times}{number of days we want to predict for.}
+
 \item{N}{value of alpha1, the infectious rate by exposed people.}
 
 \item{init_S}{value of alpha1, the infectious rate by exposed people.}

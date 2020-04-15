@@ -1,5 +1,7 @@
-library("deSolve")
 require(coronaModel)
+require(MLmetrics)
+library(reticulate)
+
 
 # Import data
 data.infected <- read.csv("time_series_covid19_confirmed_global.csv", sep=",", header = TRUE)
@@ -16,6 +18,10 @@ death <- colSums(data.death[,5:ncol(data.death)])
 
 removed <- recovered + death
 
+#######################################################
+#########################SIR#########################
+#######################################################
+
 # Assume a fixed population of 60.36 billion in Italy
 N <- 60360000
 init_b = 0.28
@@ -31,6 +37,8 @@ while (infected[ii] < min_init_I && removed[ii] <= max_init_R) {
   ii = ii + 1
 }
 infected = infected[ii:length(infected)]
+death = death[ii:length(death)]
+recovered = recovered[ii:length(recovered)]
 removed = removed[ii:length(removed)]
 
 init_I = infected[1]
@@ -49,5 +57,32 @@ pred_ode <- sir_ode_fit(opt_param, c(1:length(infected)), N, N-init_I-init_R, in
 pred <- sir_fit(length(infected), opt_param[1], opt_param[2], N - init_I, init_I, init_R, N)
 
 data <- list(I=infected,R=removed)
+loss_sir <- MSE(y_pred=pred$I, y_true=data$I)
+loss_sir
+sir_plot(pred, pred_ode, data)
 
-sir_plot(pred, data)
+#######################################################
+#########################SIERD#########################
+#######################################################
+
+os <- import("os")
+# use_python("/usr/local/bin/python3.7")
+# py_install("scipy")
+source_python('seir_main.py')
+res <- search_param(30000000, 1200, 25, infected, death, recovered) #init S, range of init E, step, confirmed data, death data, recovered data
+param <- res[1][[1]]
+E <- res[2][[1]]
+I <- infected[1]
+D <- death[1]
+C <- recovered[1]
+a1 = param$alpha1
+a2 = param$alpha2
+b = param$beta
+s = param$sigma
+g = param$gamma
+
+pred <- seird_m_fit(49,a1,a2,b,s,g,E, I, D, C, a1_dec_rate = 0.998, a2_dec_rate = 0.998)
+data <- list(I=infected, D=death, C=recovered)
+loss_seird <- MSE(y_pred = pred$I, y_true = data$I)
+loss_seird
+seird_m_plot(pred, data)
