@@ -21,10 +21,10 @@ removed <- recovered + death
 
 # Assume a fixed population of 60.36 million in Italy
 N <- 60360000
-init_b = 0.28
-init_g = 1/12
-lower_g = 0.08
-upper_g = 0.09
+init_b = 0.25
+init_g = 1/16
+lower_g = 0.06
+upper_g = 0.07
 upper_b = 0.3
 min_init_I = 20
 max_init_R = 0
