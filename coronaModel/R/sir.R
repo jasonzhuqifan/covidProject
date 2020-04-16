@@ -6,7 +6,8 @@
 #' @param upper_g The upper bound of gamma when using mle to optimize gamma.
 #' @param upper_b The upper bound of beta when using mle to optimize beta.
 #' @param confirmed A list of number of confirmed cases of real data `(day_1, ..., day_N)`.
-#' @details The poison...... TBD.
+#' @details Generate Yi that follows a poission distribution with a rate of I(ti). 
+#' Then derive a log-likelihood estimator and compute the initial beta and gamma by MLE.
 #' @return The estimated parameter beta and gamma within the limit of bound values `(beta, gamma)`.
 #' @export
 sir_mle_param <- function(init_b, init_g, lower_g, upper_g, upper_b, confirmed){
