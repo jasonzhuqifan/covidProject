@@ -1,5 +1,9 @@
 ---
-title: "Report440"
+title: |
+  | \textbf{Compartmental models: Prediction of COVID-19 Progression}
+
+author: "Group 42: Yufu Li, Zhiqing Zhang, Yongjun Zhou, Qifan Zhu"
+
 output: pdf_document
 ---
 
