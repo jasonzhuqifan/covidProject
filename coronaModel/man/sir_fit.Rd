@@ -2,30 +2,34 @@
 % Please edit documentation in R/sir.R
 \name{sir_fit}
 \alias{sir_fit}
-\title{Define a helper function to enforce additional constraints on beta and gamma so that
-the optimal parameters will be computed until they meet the requirements}
+\title{Fit SIR model using an iteration approach}
 \usage{
 sir_fit(pred_days, beta, gamma, S, I, R, N)
 }
 \arguments{
-\item{pred_days}{number of days we want to predict for.}
+\item{pred_days}{Number of days we want to predict for.}
 
-\item{beta}{value of alpha1, the infectious rate by exposed people.}
+\item{beta}{Value of beta, the rate of transition from susceptible to infected.}
 
-\item{gamma}{value of alpha1, the infectious rate by exposed people.}
+\item{gamma}{Value of gamma, the rate of transition from infected to removed.}
 
-\item{S}{value of alpha1, the infectious rate by exposed people.}
+\item{S}{Initial number of susceptible people.}
 
-\item{I}{value of alpha1, the infectious rate by exposed people.}
+\item{I}{Initial number of confirmed infected people.}
 
-\item{R}{value of alpha1, the infectious rate by exposed people.}
+\item{R}{Initial number of removed cases.}
 
-\item{N}{value of alpha1, the infectious rate by exposed people.}
+\item{N}{Total population.}
 }
 \value{
 The prediction i.e. confirmed, death, recovered based on the params for pred_days \verb{(I, D, C)}
 }
 \description{
-Define a helper function to enforce additional constraints on beta and gamma so that
-the optimal parameters will be computed until they meet the requirements
+Fit SIR model using an iteration approach
+}
+\details{
+The reparametrized SEIRD modified model is\preformatted{S_new = S_old - beta * S_old * I_old / N
+I_new = I_old + beta * S_old * I_old / N - gamma * I_old
+R_new = R_old + gamma * I_old
+}
 }

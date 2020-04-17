@@ -7,21 +7,25 @@
 sir_mle_param(init_b, init_g, lower_g, upper_g, upper_b, confirmed)
 }
 \arguments{
-\item{init_b}{number of days we want to predict for.}
+\item{init_b}{Inital guess value of beta.}
 
-\item{init_g}{value of alpha1, the infectious rate by exposed people.}
+\item{init_g}{Inital guess value of gamma.}
 
-\item{lower_g}{value of alpha1, the infectious rate by exposed people.}
+\item{lower_g}{The lower bound of gamma when using mle to optimize gamma.}
 
-\item{upper_g}{value of alpha1, the infectious rate by exposed people.}
+\item{upper_g}{The upper bound of gamma when using mle to optimize gamma.}
 
-\item{upper_b}{value of alpha1, the infectious rate by exposed people.}
+\item{upper_b}{The upper bound of beta when using mle to optimize beta.}
 
-\item{confirmed}{value of alpha1, the infectious rate by exposed people.}
+\item{confirmed}{A list of number of confirmed cases of real data \verb{(day_1, ..., day_N)}.}
 }
 \value{
-The prediction i.e. confirmed, death, recovered based on the params for pred_days \verb{(I, D, C)}
+The estimated parameter beta and gamma within the limit of bound values \verb{(beta, gamma)}.
 }
 \description{
 Maximize the log-likelihood function and compute initial estimates of beta and gamma
+}
+\details{
+Generate Yi that follows a poission distribution with a rate of I(ti).
+Then derive a log-likelihood estimator and compute the initial beta and gamma by MLE.
 }

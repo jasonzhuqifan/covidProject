@@ -2,7 +2,7 @@
 % Please edit documentation in R/seird_m.R
 \name{seird_m_fit}
 \alias{seird_m_fit}
-\title{Fit SEIR model}
+\title{Fit SEIRD modified model}
 \usage{
 seird_m_fit(
   pred_days,
@@ -20,41 +20,41 @@ seird_m_fit(
 )
 }
 \arguments{
-\item{pred_days}{number of days we want to predict for.}
+\item{pred_days}{Number of days we want to predict for.}
 
-\item{a1}{value of alpha1, the infectious rate by exposed people.}
+\item{a1}{Value of alpha1, the infectious rate by exposed people.}
 
-\item{a2}{value of alpha2, the infectious rate by infected people.}
+\item{a2}{Value of alpha2, the infectious rate by infected people.}
 
-\item{b}{value of beta, the rate of transition from exposed to infected.}
+\item{b}{Value of beta, the rate of transition from exposed to infected.}
 
-\item{s}{value of sigma, the rate of transition from infected to recovered.}
+\item{s}{Value of sigma, the rate of transition from infected to recovered.}
 
-\item{g}{value of gmma, the rate of transition from infected to death.}
+\item{g}{Value of gmma, the rate of transition from infected to death.}
 
-\item{E}{initial number of infected people with no symptom.}
+\item{E}{Initial number of infected people with no symptom.}
 
-\item{I}{initial number of confirmed infected people with symptom.}
+\item{I}{Initial number of confirmed infected people with symptom.}
 
-\item{D}{initial number of death.}
+\item{D}{Initial number of death.}
 
-\item{C}{initial number of recovered people.}
+\item{C}{Initial number of recovered people.}
 
-\item{a1_dec_rate}{the rate of decreasing alpha1, default is 1.}
+\item{a1_dec_rate}{The rate of decreasing alpha1, default is 1.}
 
-\item{a2_dec_rate}{the rate of decreasing alpha2, default is 1.}
+\item{a2_dec_rate}{The rate of decreasing alpha2, default is 1.}
 }
 \value{
 The prediction i.e. confirmed, death, recovered based on the params for pred_days \verb{(I, D, C)}.
 }
 \description{
-Fit SEIR model
+Fit SEIRD modified model
 }
 \details{
-The reparametrized SEIRD modified model is\preformatted{E = E + alpha1 * E + alpha2 * I - beta * E
-I <- I + beta * E - sigma * I - gamma * I
-D <- D + gamma * I
-C <- C + sigma * I
+The reparametrized SEIRD modified model is\preformatted{E_new = E_old + alpha1 * E_old + alpha2 * I_old - beta * E_old
+I_new = I_old + beta * E_old - sigma * I_old - gamma * I_old
+D_old = D_old + gamma * I_old
+C_old = C_old + sigma * I_old
 }
 
 where \code{alpha1} and \code{alpha2} can be given a constant decaying rate by a1_dec_rate and a2_dec_rate respectively.

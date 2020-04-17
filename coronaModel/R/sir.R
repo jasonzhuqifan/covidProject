@@ -6,7 +6,7 @@
 #' @param upper_g The upper bound of gamma when using mle to optimize gamma.
 #' @param upper_b The upper bound of beta when using mle to optimize beta.
 #' @param confirmed A list of number of confirmed cases of real data `(day_1, ..., day_N)`.
-#' @details Generate Yi that follows a poission distribution with a rate of I(ti). 
+#' @details Generate Yi that follows a poission distribution with a rate of I(ti).
 #' Then derive a log-likelihood estimator and compute the initial beta and gamma by MLE.
 #' @return The estimated parameter beta and gamma within the limit of bound values `(beta, gamma)`.
 #' @export
@@ -110,17 +110,14 @@ sir_fit <- function(pred_days, beta, gamma, S, I, R, N){
 #' @export
 sir_plot <- function(pred, pred_ode, data){
   if (!is.null(pred$I) && !is.null(data$I)) {
-    plot(pred$I, type="l", main="Infected", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$I,data$I)))
+    plot(pred$I, type="l", main="SIR Infected", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$I,data$I)))
     points(data$I, col="black")
-
-    plot(pred_ode[,3],type="l", main="Infected - Mu", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$I,data$I)))
-    points(data$I, col="black")}
-
+    legend("topleft",c("Real data","Prediction"), cex=.9, col=c("black","red"), pch=c('o','--'))
+    }
   if (!is.null(pred$R) && !is.null(data$R)) {
-    plot(pred$R, type="l", main="Removed", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$R,data$R)))
+    plot(pred$R, type="l", main="SIR Removed", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$R,data$R)))
     points(data$R, col="black")
-
-    plot(pred_ode[,3],type="l", main="Removed - Mu", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$R,data$R)))
-    points(data$R, col="black")}
+    legend("topleft",c("Real data","Prediction"), cex=.9, col=c("black","red"), pch=c('o','--'))
+  }
 }
 

@@ -2,28 +2,34 @@
 % Please edit documentation in R/sir.R
 \name{sir_ode_fit}
 \alias{sir_ode_fit}
-\title{Define a helper function to enforce additional constraints on beta and gamma so that
-the optimal parameters will be computed until they meet the requirements}
+\title{Fit the SIR model using ODE to find the prediction values for susceptible, infected and removed cases
+for a period of time, given gamma, beta and initial values of populations.}
 \usage{
 sir_ode_fit(opt_param, times, N, init_S, init_I, init_R)
 }
 \arguments{
-\item{opt_param}{number of days we want to predict for.}
+\item{opt_param}{The estimated parameter beta and gamma within the limit of bound values \verb{(beta, gamma)}.}
 
-\item{times}{number of days we want to predict for.}
+\item{times}{A vector from 1 to the number of day we want to fit \verb{(1, 2, ..., N)}.}
 
-\item{N}{value of alpha1, the infectious rate by exposed people.}
+\item{N}{The value of otal population.}
 
-\item{init_S}{value of alpha1, the infectious rate by exposed people.}
+\item{init_S}{The value of initial susceptible people.}
 
-\item{init_I}{value of alpha1, the infectious rate by exposed people.}
+\item{init_I}{The value of initial infected people.}
 
-\item{init_R}{value of alpha1, the infectious rate by exposed people.}
+\item{init_R}{The value of initial removed people.}
 }
 \value{
-The prediction i.e. confirmed, death, recovered based on the params for pred_days \verb{(I, D, C)}
+The prediction i.e. susceptible, infected, removed \verb{(S, I, C)}.
 }
 \description{
-Define a helper function to enforce additional constraints on beta and gamma so that
-the optimal parameters will be computed until they meet the requirements
+Fit the SIR model using ODE to find the prediction values for susceptible, infected and removed cases
+for a period of time, given gamma, beta and initial values of populations.
+}
+\details{
+The reparametrized SIR model is\preformatted{S_new = S_old - beta * S_old * I_old / N
+I_new = I_old + beta * S_old * I_old / N - gamma * I_old
+R_new = R_old + gamma * I_old
+}
 }

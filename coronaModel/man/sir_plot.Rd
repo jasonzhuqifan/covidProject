@@ -2,17 +2,21 @@
 % Please edit documentation in R/sir.R
 \name{sir_plot}
 \alias{sir_plot}
-\title{Calculate quantile regerssion loss}
+\title{Plot SIR models on confirmed cases and removed cases.}
 \usage{
 sir_plot(pred, pred_ode, data)
 }
 \arguments{
-\item{pred}{contact rate}
+\item{pred}{Prediction values of confirmed cases and removed cases. \verb{(I, R)}.}
 
-\item{pred_ode}{contact rate}
-
-\item{data}{removed rate}
+\item{data}{True values of confirmed cases and removed cases. \verb{(I, R)}.}
+}
+\value{
+Two plots of infection cases and cremoved cases respectively.
 }
 \description{
-Calculate quantile regerssion loss
+Plot SIR models on confirmed cases and removed cases.
+}
+\details{
+Plot the models of infection and removed cases seperately with prediction and real data.
 }

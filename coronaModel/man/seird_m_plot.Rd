@@ -2,20 +2,20 @@
 % Please edit documentation in R/seird_m.R
 \name{seird_m_plot}
 \alias{seird_m_plot}
-\title{Plot SIER models on confirmed cases, death cases and recovered cases.}
+\title{Plot SIERD modified models on confirmed cases, death cases and recovered cases.}
 \usage{
 seird_m_plot(pred, data)
 }
 \arguments{
-\item{pred}{prediction values of confirmed cases, death cases and recovered cases. \verb{(I, D, C)}.}
+\item{pred}{Prediction values of confirmed cases, death cases and recovered cases. \verb{(I, D, C)}.}
 
-\item{data}{true values of confirmed cases, death cases and recovered cases. \verb{(I, D, C)}.}
+\item{data}{True values of confirmed cases, death cases and recovered cases. \verb{(I, D, C)}.}
 }
 \value{
 The plots of confirmed cases, death cases and recovered cases.
 }
 \description{
-Plot SIER models on confirmed cases, death cases and recovered cases.
+Plot SIERD modified models on confirmed cases, death cases and recovered cases.
 }
 \details{
 Plot the given data seperately with prediction and real data.
