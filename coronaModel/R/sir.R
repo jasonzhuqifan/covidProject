@@ -111,14 +111,14 @@ sir_fit <- function(pred_days, beta, gamma, S, I, R, N){
 #' @export
 sir_plot <- function(pred, pred_ode, data){
   if (!is.null(pred$I) && !is.null(data$I)) {
-    plot(pred$I, type="l", main="SIR Infected", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$I,data$I)))
+    plot(pred$I, type="l", main="SIR Infected", col="red", ylab = "Number of People", xlab = "Days", cex.main=0.8, cex.lab=0.8, cex.axis=0.8, ylim = c(0, max(pred$I,data$I)))
     points(data$I, col="black")
-    legend("topleft",c("Real data","Prediction"), cex=.9, col=c("black","red"), pch=c('o','--'))
+    legend("topleft",c("Real data","Prediction"), cex=.8, col=c("black","red"), pch=c('o','--'))
     }
   if (!is.null(pred$R) && !is.null(data$R)) {
-    plot(pred$R, type="l", main="SIR Removed", col="red", ylab = "Number of People", xlab = "Days", ylim = c(0, max(pred$R,data$R)))
+    plot(pred$R, type="l", main="SIR Removed", col="red", ylab = "Number of People", xlab = "Days", cex.main=0.8, cex.lab=0.8, cex.axis=0.8, ylim = c(0, max(pred$R,data$R)))
     points(data$R, col="black")
-    legend("topleft",c("Real data","Prediction"), cex=.9, col=c("black","red"), pch=c('o','--'))
+    legend("topleft",c("Real data","Prediction"), cex=.8, col=c("black","red"), pch=c('o','--'))
   }
 }
 

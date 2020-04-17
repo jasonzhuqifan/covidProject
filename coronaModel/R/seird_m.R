@@ -59,17 +59,17 @@ seird_m_fit <- function(pred_days, a1, a2, b, s, g, E, I, D, C, a1_dec_rate=1, a
 #' @export
 seird_m_plot <- function(pred, data){
   if (!is.null(pred$I) && !is.null(data$I)) {
-    plot(pred$I, type="l", main="SEIRD Confirmed", col="red", ylab = "Number of People", xlab = "Iterations", ylim = c(0, max(pred$I + data$I)))
+    plot(pred$I, type="l", main="SEIRD Confirmed", col="red", ylab = "Number of People", xlab = "Days", cex.main=1.1, cex.lab=1.1, cex.axis=1.1)
     points(data$I, col="black")
     legend("topleft",c("Real data","Prediction"), cex=.9, col=c("black","red"), pch=c('o','--'))
   }
   if (!is.null(pred$D) && !is.null(data$D)) {
-    plot(pred$D, type="l", main="SEIRD Death", col="red", ylab = "Number of People", xlab = "Iterations", ylim = c(0, max(pred$D + data$D)))
+    plot(pred$D, type="l", main="SEIRD Death", col="red", ylab = "Number of People", xlab = "Days", cex.main=1.1, cex.lab=1.1, cex.axis=1.1)
     points(data$D, col="black")
     legend("topleft",c("Real data","Prediction"), cex=.9, col=c("black","red"), pch=c('o','--'))
   }
   if (!is.null(pred$C) && !is.null(data$C)) {
-    plot(pred$C, type="l", main="SEIRD Recovered", col="red", ylab = "Number of People", xlab = "Iterations", ylim = c(0, max(pred$C + data$C)))
+    plot(pred$C, type="l", main="SEIRD Recovered", col="red", ylab = "Number of People", xlab = "Days", cex.main=1.1, cex.lab=1.1, cex.axis=1.1)
     points(data$C, col="black")
     legend("topleft",c("Real data","Prediction"), cex=.9, col=c("black","red"), pch=c('o','--'))
   }
