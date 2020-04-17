@@ -47,7 +47,7 @@ removed = removed[ii:length(removed)]
 # Abstract
 Coronavirus disease 2019 (COVID-19) is a respiratory illness that can spread from person to
 person. The novel coronavirus was first identified during an investigation into an outbreak in
-Wuhan, China (CDC, 2020). Up to March 12, there were 125,260 confirmed cases worldwide and 80,981 confirmed cases in China (WHO, 2020). Given the severity of this epidemic, it is crucial to estimate the theoretical number of people infected with COVID-19 over time. At first glance, we apply the deterministic SIR model to predict the progression of this virus.  Although this compartmental model provides a basis to predict the progression of such an epidemic, it excludes the exposed individuals and fails to distinguish the recovered and fatal individuals. Moreover, it assumes that the parameters are fixed. To cope with these issues, we then introduce the modified SEIRD model, which includes more compartments and makes two of its parameters adjustable. However, 
+Wuhan, China (CDC, 2020). Up to March 12, there were 125,260 confirmed cases worldwide and 80,981 confirmed cases in China (WHO, 2020). Given the severity of this epidemic, it is crucial to estimate the theoretical number of people infected with COVID-19 over time. At first glance, we apply the deterministic SIR model to predict the progression of this virus.  Although this compartmental model provides a basis to predict the progression of such an epidemic, it excludes the exposed individuals and fails to distinguish the recovered and fatal individuals. Moreover, it assumes that the parameters are fixed. To cope with these issues, we then introduce the modified SEIRD model, which includes more compartments and makes two of its parameters adjustable. We then include stochastic SIR and SEIR models to reveal the discrete transitions among states. The model implemented is an agent based decision analysis Markov chain Monte Carlo framework to generate subject-level infectious history, which is more robust to the missing infectious count data. 
 
 # 1. Introduction
 The basic SIR model was first used by Kermack and McKendrick in 1927. In this model, we simply divide the population into three compartments: $S$ (susceptible), $I$ (infectious), $R$ (removed) with probabilities of state changes denoted by $\beta$ (effective contact rate) and $\gamma$ (removal rate).  Therefore, the ordinary differential equation (ODE) describing the dynamics of SIR model has the following deterministic form:
@@ -66,7 +66,7 @@ where  $S(t) + I(t) + R(t) = N$  is the constant total population size (IDM, 202
 Although this model provides the basis for studying and tracking an epidemic, it deploys some problematic assumptions for simplicity such as constant transmissibility and removal rate over the epidemic period and a well-mixed population that any infected individual has the same probability of contacting any susceptible individual that is reasonably well approximated by the average (Jones, 2007). Moreover, it excludes the asymptomatic infected cases and fails to distinguish the recovered and dead individuals. Last but not least, when the $R_0$(reproductive number) is greater than 1 where $R_0 = \frac{\beta}{\gamma}$, the model converges to an endemic equilibrium that violates our assumption that the disease will eventually disappear (Allen & Burgin, 1999). \bigskip
 
 
-Building on the basic SIR model and the classic SEIR model (See Appendix), our modified SEIRD model takes $E$ (exposed individuals) into consideration. However, unlike the classic SEIR model defines exposed individuals as the infected individuals but not yet infectious, we define exposed individuals as individuals with COVID-19 who are asymptomatic. This modification allows the model to address the fact that individuals with no symptoms could still spread COVID-19 during $E$ and estimate their removed compartment into recovered compartment $R$ and dead compartment $D$ by replacing the removal rate by the $\sigma$ (recovery rate) and the $\gamma$ (death rate). In this model, $\alpha_1$ denotes the infectious rate of $S$ infected by $E$, $\alpha_2$ denotes the infectious rate of $S$ infected by $I$ and beta denotes the transmission rate from exposed to infected
+Building on the basic SIR model and the classic SEIR model (See Appendix A), our modified SEIRD model takes $E$ (exposed individuals) into consideration. However, unlike the classic SEIR model defines exposed individuals as the infected individuals but not yet infectious, we define exposed individuals as individuals with COVID-19 who are asymptomatic. This modification allows the model to address the fact that individuals with no symptoms could still spread COVID-19 during $E$ and estimate their removed compartment into recovered compartment $R$ and dead compartment $D$ by replacing the removal rate by the $\sigma$ (recovery rate) and the $\gamma$ (death rate). In this model, $\alpha_1$ denotes the infectious rate of $S$ infected by $E$, $\alpha_2$ denotes the infectious rate of $S$ infected by $I$ and beta denotes the transmission rate from exposed to infected
 $$
 \begin{aligned}
  \frac{dS}{dt} &= \alpha_1 * E(t) - \alpha_2 * I(t) \\
@@ -76,6 +76,8 @@ $$
  \frac{dD}{dt} &= \sigma * I(t) \\
 \end{aligned}
 $$
+
+Stochastic epidemic models (SEM), on the other hand, allows for more dynamic and realistic assumptions. For example, it assumes the transition from one compartment to another is discrete, whereas the SIR and SEIR models described above are discrete. The stochastic SIR model implemented in this report tolerates the partial observability of infected data. However, the parameters of stochastic SIR model, such as per-contact infectivity rate and recovery rate, are more difficult to estimate. In 2017, Fintzi et al. proposed an agent-based decision analysis Markov chain Monte Carlo (MCMC) framework for fitting SEMs time-series count data. This agent-based model completes the subject-level infection history, through an MCMC that targets the joint posterior distribution of the latent epidemic process and model parameters. Conditionally on the historical disease data of one individual and rates given by other individuals, the model proposes a subject-path for each individual by a time-inhomogeneous continuous-time Markov chain. Compared to other previous models, this model is more robust to missing data and allows for more efficient purtations to the latent epidemic paths. 
 
 # 2. Methodology
 ## 2.1 Deterministic SIR Model
@@ -96,7 +98,6 @@ Let $Y_i=(S(t_i), E(t_i),I(t_i), R(t_i), D(t_i)$ denote the random variables for
 2. We then input each $E_0$ together with the real dataset to generate parameters $\alpha_1$, $\alpha_2$, $\beta$, $\sigma$ and $\gamma$. We also assign a function to $\alpha_1$ and $\alpha_1$ respectively to improve the flexibility of the model. The set of parameters that has the minimum log loss between the real data and the predicted data, or the maximum average R score will be returned.
 
 ## 2.3 Stochastic SIR Model
-Stochastic epidemic models (SEM), on the other hand, allows for more dynamic and realistic assumptions. For example, it assumes the transition from one compartment to another is discrete, whereas the SIR and SEIR models described above are discrete. The stochastic SIR model implemented in this report tolerates the partial observability of infected data. However, the parameters of stochastic SIR model, such as per-contact infectivity rate and recovery rate, are more difficult to estimate. In 2017, Fintzi et al. proposed an agent-based decision analysis Markov chain Monte Carlo (MCMC) framework for fitting SEMs time-series count data. This agent-based model completes the subject-level infection history, through an MCMC that targets the joint posterior distribution of the latent epidemic process and model parameters. Conditionally on the historical disease data of one individual and rates given by other individuals, the model propose a subject-path for each individual by a time-inhomogeneous countinuous-time Markov chain. Comparing to other previous models, this model is more robust to missing data and allows for a more efficient purtations to the latent epidemic paths. 
 
 Data augmentation (BDA) in the context of fitting a stochastic SIR model to binomially distributed prevalence. We assume the detected cases follow a binomial distribution, where $Y={Y_1,..., Y_L}$ denotes the disease prevalence counts recorded at times $t_1,...,t	_L\in[t_1,t_L]$. Since the infectious numbers are often partially observable, we assume the possibility of observing a true prevalence at each observation time as $Y_l|I_{t_l} \sim Binomial (I_{t_l},)$. We then propose  $X(\tau)={X_1(\tau),..., X_N(\tau)}$, where $X(\tau)$ is a configuration of the realized subject-path in one of S, I, R state at time. Let be the infectivity parameter, be the recovery rate, be the sampling probability and $p_{t_1}$be the probability of a patient is in state S, I or R at the beginning. We then have the complete data likelihood
 
@@ -240,27 +241,8 @@ In figure 2,  $\alpha_1$ = 0.8536, $\alpha_2$ = 0, $\beta$ = 0.7035, $\sigma$ = 
 Given Italy's population of 60,360,000, the mean squared error (MSE) of the deterministic SIR model and the modified SEIRD model are 1,846,190,536 and 704,207,089 respectively. As a result, the modified SEIRD model has a better fit as its MSE is smaller.
 
 ## 3.3 Stochastic SIR Model
-We fit the data from [Waterloo region](https://www.regionofwaterloo.ca/en/health-and-wellness/positive-cases-in-waterloo-region.aspx). The first case observed is on Februrary 20th, and we collected 43 dyas of data point. 
+We fit the data from [Waterloo region](https://www.regionofwaterloo.ca/en/health-and-wellness/positive-cases-in-waterloo-region.aspx). The first case observed is on Februrary 20th, and we collected 43 dyas of data point. \newline
 
-```{r echo=TRUE, include=FALSE}
-start_date = as.Date("2020-02-27")
-dates = c(start_date)
-for (i in 1:42){
-  dates = c(dates,start_date+i )
-}
-
-waterloo_cases = c(0,1,3,0,1,0,0,1,2,2,1,3,8,5,8,6,8,7,8,11,
-                   8,14,6,7,6,6,10,8,9,4,2,9,4,14,8,8,10,11,
-                   12,11,21,8,2)
-times = 0:(length(waterloo_cases)-1)
-waterloo_df = data.frame(waterloo_cases, dates)
-waterloo_sampled <- as.matrix(data.frame( time=times, I=waterloo_cases))
-```
-
-
-```{r echo=TRUE, include=FALSE}
-barplot(waterloo_cases, xlab="Date", names.arg=dates)
-```
 The initial state probability parameters are sampled through Dirichlet-Multinomial conjugate distributions for Stochastic SIR model, then we set values for the following parameters.
 - `obstimes`: Vector of observation times at which prevalence is sampled. We leave it empty before fitting.
 
@@ -268,14 +250,9 @@ The initial state probability parameters are sampled through Dirichlet-Multinomi
 
 - `states`: Categorical vector for the states. We use ```c("S", "I", "R")``` for the SIR model and ```c("S", "E", "I", "R")``` for the SEIR model.
 
-- `params`: Named numeric vector of model parameters. The parameters include the values for per-contact infectivity, recovery rate, and binomial sampling probability for SIR model and one extra parameter gamma for SEIR model. The parameters also include the intial values for each compartments, which are denoted as S0, I0, E0, and R0. We use the following as the initial probability
-
-  - beta=0.00016 \
-  - mu=0.26 \
-  - rho=0.09 \
-  - popsize=1500 \
+- `params`: Named numeric vector of model parameters. The parameters include the values for per-contact infectivity, recovery rate, and binomial sampling probability for SIR model and one extra parameter gamma for SEIR model. The parameters also include the intial values for each compartments, which are denoted as S0, I0, E0, and R0. We use the following as the initial probability: $\beta=0.00016$, $\mu=0.26$, $\rho=0.09$, $popsize=1500$ 
   
-- `rates`:  Vector of strings that state how to compute the *unlumped* rates for each type of transition. See the supplement of Fintzi, Wakefield, and Minin (2016) for a discussion of the distinction between lumped and unlumped rates. We use ```c("beta * I", "mu")``
+- `rates`:  Vector of strings that state how to compute the *unlumped* rates for each type of transition. See the supplement of Fintzi, Wakefield, and Minin (2016) for a discussion of the distinction between lumped and unlumped rates. We use ```c("beta * I", "mu")```
 
 - `flow`: This parameter is a numeric matrix represents the movement of individuals in each compartment, where the column corresponds to the compartments in the `states` and the rows correspond to the transition events in `rates`. We use 
 - `meas_vars`: Character vector of the observed model compartment. We use "I" for this case. 
@@ -283,351 +260,16 @@ The initial state probability parameters are sampled through Dirichlet-Multinomi
 - `r_meas_process, d_meas_process`: The functions for sampling from and evaluating the log-density of the measurement process. We use the sampling function and the density function for binomial distribution and rho being the sampling probability.
 
 
-To fit the model, we use the `fit_model` function to estimate the SEM parameters. During the actual practice, it's not always easy to find the best parameter, so we wrote an utility function that checks if the difference of the parameter we passed in and the average of `n` iterations of the model is less than a threshold.  
+To fit the model, we use the `fit_model` function to estimate the SEM parameters. During the actual practice, it's not always easy to find the best parameter, so we wrote an utility function that checks if the difference of the parameter we passed in and the average of `n` iterations of the model is less than a threshold.
 
-```{r echo=FALSE, eval=FALSE}
+![alt text here](images/dist.jpeg)
 
+![alt text here](images/dist2.jpeg)
 
-r_meas_process <- function(state, meas_vars, params){
-  #' Using binomial distribution to sample values according to specified variable and probability 
-  #'
-  #' @param state the name of the compartments.
-  #' @param meas_vars variable to be measured
-  #' @param params the named list of parameters
-  #' @param log whether or not to output the logarithmic result
-  #' @return samples from meas_vars with probabiliy from specified param
-  #' @export
-  res=rbinom(n = nrow(state), 
-             size = state[,meas_vars], # binomial sample of the unobserved prevalence
-             prob = params["rho"])     # sampling probability
-  res
-}
+![alt text here](images/dist3.jpeg)
 
-d_meas_process <- function(state, meas_vars, params, log = TRUE) {
-  #' Calculate the density distribution of binomial model according to the specified variable and probability
-  #'
-  #' @param state the name of the compartments.
-  #' @param meas_vars variable to be measured, but here we will use the observed and augmented subjects, ie. I_observed and I_augmented, here.
-  #' @param params the named list of parameters
-  #' @param log whether or not to output the logarithmic result
-  #' @return valuse of density from the specified size and probability
-  #' @export
-  res=dbinom(x = state[, "I_observed"], 
-             size = state[, "I_augmented"], 
-             prob = params["rho"], log = log)
-  res
-}
-
-get_avg <- function(param){
-  #' Calculate the average for each columns
-  #'
-  #' @param param parameter matrix to calculate avarege
-  #' @return calcualte average with 10 burn-in values
-  #' @export 
-  # Discard the first 10 iterations of each chain as burin-in
-  mean(param[10:length(param)])
-}
-
-
-
-Rcpp::cppFunction("Rcpp::NumericVector getSuffStats_SEIR(const Rcpp::NumericMatrix& pop_mat, const int ind_final_config) {
-                  // Function to update beta and mu and gamma 
-                  // initialize sufficient statistics
-                  int num_exp = 0;       // number of exposure events
-                  int num_inf = 0;       // number of exposed --> infectious events
-                  int num_rec = 0;       // number of recovery events
-                  double beta_suff  = 0; // integrated hazard for the exposure
-                  double gamma_suff = 0; // integrated hazard for addition of infectives
-                  double mu_suff    = 0; // integrated hazard for the recovery
-                  
-                  // initialize times
-                  double cur_time = 0;              // current time
-                  double next_time = pop_mat(0,0);  // time of the first event
-                  double dt = 0;                    // time increment
-                  
-                  // compute the sufficient statistics - loop through the pop_mat matrix until
-                  // reaching the row for the final observation time
-                  for(int j = 0; j < ind_final_config - 1; ++j) {
-                  
-                  cur_time = next_time;         
-                  next_time = pop_mat(j+1, 0); // grab the time of the next event
-                  dt = next_time - cur_time;
-                  
-                  beta_suff  += pop_mat(j, 3) * pop_mat(j, 5) * dt; // add S*I*(t_{j+1} - t_j) to beta_suff
-                  gamma_suff += pop_mat(j, 4) * dt;                 // add E*(t_{j+1} - t_j) to gamma_suff
-                  mu_suff    += pop_mat(j, 5) * dt;                 // add I*(t_{j+1} - t_j) to mu_suff
-                  
-                  if(pop_mat(j + 1, 2) == 1) {  
-                  num_exp += 1;            // if the next event is an exposure, increment the number of exposures
-                  } else if(pop_mat(j + 1, 2) == 2) {
-                  num_inf += 1;            // if the next event adds an infective, increment the number of infections
-                  } else if(pop_mat(j + 1, 2) == 3) {
-                  num_rec += 1;            // if the next event is a recover, increment the number of recovery
-                  }
-                  }
-                  
-                  // return the vector of sufficient statistics for the rate parameters
-                  return Rcpp::NumericVector::create(num_exp, beta_suff, num_inf, gamma_suff, num_rec, mu_suff);
-                  }")
-
-
-gibbs_kernel_SEIR <- function(epimodel) {
-  #' Using Gibbs sampler to update parameters from the full conditional distibutions for SEIR model
-  #'
-  #' @param epimodel the class of epidemic mpdel 
-  #' @references (Gibbs template)[ https://github.com/fintzij/BDAepimodel/blob/f73daebff0d46bbd7e68af1429f37b4665fae92b/R/gibbs_template.R]
-  #' @return updated epimodel
-  #' @export
-  # get sufficient statistics using the previously compiled getSuffStats function (above)
-  suff_stats <- getSuffStats_SEIR(epimodel$pop_mat, epimodel$ind_final_config)
-  
-  # update parameters from their univariate full conditional distributions
-  # beta  ~ Gamma(1, 10000)
-  # gamma ~ Gamma(1, 11)
-  # mu    ~ Gamma(3.2, 100)
-  # rho   ~  Beta(3.5, 6.5)
-  # p_{t_1} ~ Dirichlet(100, 0.1, 0.4, 0.01)
-  proposal          <- epimodel$params # params is the vector of ALL model parameters
-  proposal["beta"]  <- rgamma(1, 1 + suff_stats[1], 10000 + suff_stats[2])
-  proposal["gamma"] <- rgamma(1, 1 + suff_stats[3], 11 + suff_stats[4])
-  proposal["mu"]    <- rgamma(1, 3.2 + suff_stats[5], 100 + suff_stats[6])
-  proposal["rho"]   <- rbeta(1, 
-                             shape1 = 3.5 + sum(epimodel$obs_mat[,"I_observed"]), 
-                             shape2 = 6.5 + sum(epimodel$obs_mat[,"I_augmented"]- epimodel$obs_mat[,"I_observed"]))
-  
-  # update array of rate matrices
-  epimodel          <- build_new_irms(epimodel, proposal)
-  
-  # compute new eigendecompositions of CTMC rate matrices analytically
-  buildEigenArray_SEIR(real_eigenvals = epimodel$real_eigen_values,
-                       imag_eigenvals = epimodel$imag_eigen_values,
-                       eigenvecs      = epimodel$eigen_vectors, 
-                       inversevecs    = epimodel$inv_eigen_vectors, 
-                       irm_array      = epimodel$irm, 
-                       n_real_eigs    = epimodel$n_real_eigs, 
-                       initial_calc   = FALSE)
-  
-  # get the data log-likelihood under the new parameters
-  obs_likelihood_new <- calc_obs_likelihood(epimodel, params = proposal, log = TRUE) #### NOTE - log = TRUE
-  
-  # compute the new population level CTMC log-likelihood
-  pop_likelihood_new <- epimodel$likelihoods$pop_likelihood_cur +
-            suff_stats[1] * (log(proposal["beta"]) - log(epimodel$params["beta"])) + 
-            suff_stats[3] * (log(proposal["gamma"]) - log(epimodel$params["gamma"])) +
-            suff_stats[5] * (log(proposal["mu"]) - log(epimodel$params["mu"])) -
-            suff_stats[2] * (proposal["beta"] - epimodel$params["beta"]) - 
-            suff_stats[4] * (proposal["gamma"] - epimodel$params["gamma"]) - 
-            suff_stats[6] * (proposal["mu"] - epimodel$params["mu"])
-  
-  # update parameters, likelihood objects, and eigen decompositions
-  epimodel <- update_params(epimodel,
-                            params = proposal,
-                            pop_likelihood = pop_likelihood_new,
-                            obs_likelihood = obs_likelihood_new
-            )
-  
-  return(epimodel)
-}
-
-best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100, thres=2e-5, pop_size=2000){
-  #' Calculate the average for each columns
-  #'
-  #' @param param parameter matrix to calculate avarege
-  #' @return calcualte average with 10 burn-in values
-  #' @export 
-
-  curr_iter = 1
-  while (curr_iter < max_iter){
-    beta = as.numeric(params["beta"])
-    mu = as.numeric(params["mu"])
-    rho = as.numeric(params["rho"])
-    
-    if(!SEIR){
-      print (paste0("Iteration ", curr_iter))
-      init_dist <- MCMCpack::rdirichlet(1, c(9,0.5,0.1))
-      epimodel <- init_epimodel(popsize = pop_size,                                         # population size
-                                states = c("S", "I", "R"),                                          # compartment names
-                                params = c(beta = abs(rnorm(1, beta, 1e-5)),                        # per-contact infectivity rate
-                                           mu = abs(rnorm(1, mu, 1e-3)),                            # recovery rate
-                                           rho = abs(rnorm(1, rho, 1e-3)),                                   # binomial sampling probability
-                                           S0 = init_dist[1], I0 = init_dist[2], R0 = init_dist[3]), # initial state probabilities
-                                rates = c("beta * I", "mu"),                                         # unlumped transition rates
-                                flow = matrix(c(-1, 1, 0, 0, -1, 1), ncol = 3, byrow = T),           # flow matrix
-                                dat = dat,                                                           # dataset
-                                time_var = "time",                                                   # name of time variable in the dataset
-                                meas_vars = "I",                                                     # name of measurement variable
-                                initdist_prior = c(90, 2, 5), ### Parameters for the dirichlet prior distribution for the initial state probs
-                                r_meas_process = r_meas_process,
-                                d_meas_process = d_meas_process)
-      epimodel <- init_settings(epimodel,
-                                niter = niter,  # this was set to 100,000 in the paper
-                                save_params_every = 1,
-                                save_configs_every = 250, # this was set to 250 in the paper
-                                kernel = list(gibbs_SIR),
-                                configs_to_redraw = 20, # this was set to 75 in the paper
-                                analytic_eigen = "SIR", # compute eigen decompositions and matrix inverses analytically
-                                ecctmc_method = "unif", # sample subject paths in interevent intervals via modified rejection sampling
-                                seed = 52787)   
-      
-      epimodel <- tryCatch({fit_epimodel(epimodel, monitor = FALSE)},
-                       error=function(cond) {
-                          message("Reinitialize model")
-                          message(cond)
-                          # Choose a return value in case of error
-                          return(NULL)
-                      })
-      # epimodel <- fit_epimodel(epimodel, monitor = FALSE)
-      
-      if (!is.null(epimodel)){
-        old_params = params
-        old_beta = beta
-        # print (epimodel$results$params)
-        params = apply(epimodel$results$params, 2, get_avg)
-        beta = params["beta"]
-        if (abs(beta - old_beta) < thres) {
-          epimodel$avg_params = params
-          break
-      } else {
-        curr_iter = curr_iter + 1 
-      }
-      }
-      
-
-    } else {
-      
-      print (paste0("Iteration ", curr_iter))
-      # if using SEIR model 
-      # initialize params
-      gamma = as.numeric(params["gamma"])
-      
-      # initial values for initial state parameters
-      init_dist <- rnorm(4, c(0.99, 0.01, 0.01, 0.001) , 1e-4); init_dist <- abs(init_dist) / sum(abs(init_dist))
-      
-      epimodel  <- init_epimodel(popsize = pop_size,                                                       # population size
-                                 states = c("S", "E", "I", "R"),                                      # compartment names
-                                 params = c(beta = abs(rnorm(1, beta, 1e-7)),                           # infectivity rate
-                                            gamma = abs(rnorm(1, gamma, 0.01)),                             # latent period rate
-                                            mu = abs(rnorm(1, mu, 0.001)),                                  # recovery rate
-                                            rho = abs(rnorm(1, rho, 1e-3)),                                 # binomial sampling prob
-                                            S0 = init_dist[1], E0 = init_dist[2], I0 = init_dist[3], R0 = init_dist[4]),
-                                 rates = c("beta * I", "gamma", "mu"),                # unlumped transition rates
-                                 flow = matrix(c(-1, 1, 0, 0,
-                                                 0, -1, 1, 0,
-                                                 0, 0, -1, 1), ncol = 4, byrow = T),  # flow matrix
-                                 dat = dat,                                           # dataset
-                                 time_var = "time",                                   # name of time variable in the dataset
-                                 meas_vars = "I",                                     # name of measurement var in the dataset
-                                 initdist_prior = c(100, 0.1, 0.4, 0.01), ### Parameters for the dirichlet prior distribution for the initial state probs
-                                 r_meas_process = r_meas_process,
-                                 d_meas_process = d_meas_process)
-      
-      epimodel <- init_settings(epimodel,
-                                niter = niter, # set to 100000 for the paper
-                                save_params_every = 1, 
-                                save_configs_every = 20, # this was set to 250 for the chains run in the paper
-                                kernel = list(gibbs_kernel_SEIR),
-                                configs_to_redraw = 1, # this was set to 100 in the paper
-                                analytic_eigen = "SEIR", # compute eigen decompositions analytically
-                                ecctmc_method = "unif",  # sample paths in inter-event intervals via uniformization
-                                seed = 52787)
-      
-      # epimodel <- fit_epimodel(epimodel, monitor = FALSE)
-      # 
-      # 
-      # old_params = params
-      # old_beta = beta
-      # # print (epimodel$results$params)
-      # params = apply(epimodel$results$params, 2, get_avg)
-      # beta = params["beta"]
-      # if (abs(beta - old_beta) < thres) {
-      #   epimodel$avg_params = params
-      #   break
-      # } else {
-      #   curr_iter = curr_iter + 1
-      # }
-      epimodel <- tryCatch({fit_epimodel(epimodel, monitor = FALSE)},
-                       error=function(cond) {
-                          message("Reinitialize model")
-                          message(cond)
-                          # Choose a return value in case of error
-                          return(NULL)
-                      })
-      # epimodel <- fit_epimodel(epimodel, monitor = FALSE)
-
-      if (!is.null(epimodel)){
-          old_params = params
-          old_beta = beta
-          # print (epimodel$results$params)
-          params = apply(epimodel$results$params, 2, get_avg)
-          beta = params["beta"]
-          if (abs(beta - old_beta) < thres) {
-            epimodel$avg_params = params
-            break
-        } else {
-          curr_iter = curr_iter + 1
-        }
-      }
-    }
-  }
-  
-  if (curr_iter >= 100 ) {
-    print("Best params were not found, returning the last model...")
-    return (epimodel)
-  }
-  
-  
-  ts.plot(epimodel$results$params[,"beta"], ylab = expression(beta), main="Infectivity Rate")
-  plot(hist(epimodel$results$params[,"mu"]), main = "Recovery Rate")
-  plot(hist(epimodel$results$params[,"rho"]), main = "Binomial s/ ampling probability")
-  
-  if (SEIR){plot(hist(epimodel$results$params[,"gamma"]), main = "Infectivity Rate")}
-  
-  return (epimodel)
-  
-}
-
-```
-
-
-
-
-```{r eval=FALSE, echo=FALSE}
-initial_params_1500 <- list(beta=0.00015, mu=0.26, rho=0.09)
-epimodel_1500 <- best_parmas_finder(initial_params_1500, 
-                                    dat=waterloo_sampled, 
-                                    thres=4e-6, pop_size=1500)
-
-epimodel_1500$params
-plot_latent_posterior(epimodel_1500, 
-                      states = "I", times = epimodel$obstimes, cm = "mn")
-```
-
-```{r eval=FALSE, echo=FALSE}
-initial_params_2000 <- list(beta=0.00016, mu=0.26, rho=0.09)
-epimodel_2000 <- best_parmas_finder(initial_params_2000, 
-                                    dat=waterloo_sampled,
-                                    thres=4e-6, pop_size=2000)
-
-epimodel_2000$params
-plot_latent_posterior(epimodel_2000, 
-                      states = "I", times = epimodel$obstimes, cm = "mn")
-```
-
-
-```{r eval=FALSE, echo=FALSE}
-initial_params <- list(beta=0.00040, gamma=0.10, mu=0.03, rho=0.010)
-epimodel <- best_parmas_finder(initial_params, dat=waterloo_sampled, 
-                               SEIR=TRUE, thres=1e-5, pop_size=1500)
-```
-
-
-```{r eval=FALSE, echo=FALSE}
-initial_params <- list(beta=0.00040, gamma=0.10, mu=0.03, 
-                       rho=0.010, popsize=1500)
-epimodel <- best_parmas_finder(initial_params,
-                               dat=waterloo_sampled, SEIR=TRUE,
-                               thres=1e-5, pop_size=2000)
-```
+![alt text here](images/dist4.jpeg)
+\newline
 
 # 4. Discussion
 Coming back to these three compartmental models respectively, first, the basic SIR model lays down a foundation for studying how COVID-19 evolves. It relies on the assumptions that the population is well-mixed and closed and individual characteristics of transmissibility and ability to recover are the same for all population. This model has a lot of room for improvement as it first oversimplifies the problem by only dividing the population into three groups in terms of two fixed parameters that are supposed to change due to externalities over time. Second, the initial inputs required for parameter estimation might bring in initial error that can affect the latter MLE. Moreover, this model does not converge to an disease-free equilibrium when R0is greater than 1. \bigskip
@@ -654,9 +296,9 @@ IDM. (n.d.). SIR and SIRS models. Retrieved April 17, 2020, from https://idmod.o
 Jones, J. (2007, May 1). Notes On R0 [PDF File](p. 2). Stanford, California: Stanford University. Retrieved April 17, 2020 from https://web.stanford.edu/~jhj1/teachingdocs/Jones-on-R0.pdf \newline
 Koehrsen, W. (2018, January 28). Overfitting vs. Underfitting: A Complete Example. Retrieved from https://towardsdatascience.com/overfitting-vs-underfitting-a-complete-example-d05dd7e19765
 
-# 6. Appendix
+# 6. Appendices
 
-SEIR Model: \newline
+## Appendix A SEIR Model
 
 $S$ is the fraction of susceptible individuals (those able to contract the disease),
 $E$ is the fraction of exposed individuals (those who have been infected but are not yet infectious),
@@ -682,6 +324,330 @@ R_0 &= \frac{\beta_0 \alpha}{(\mu + \alpha) (\mu + \gamma)}
 \end{aligned}
 $$
 
-it can be shown that for $R_0>1$ the model has a fixed point with $I=0$ which is unstable, and a fixed point with $I>0$ which is stable, etc.
+it can be shown that for $R_0>1$ the model has a fixed point with $I=0$ which is unstable, and a fixed point with $I>0$ which is stable, etc. 
+
+## Appendix B Waterloo region data
+
+```{r echo=FALSE, include=TRUE}
+start_date = as.Date("2020-02-27")
+dates = c(start_date)
+for (i in 1:42){
+  dates = c(dates,start_date+i )
+}
+
+waterloo_cases = c(0,1,3,0,1,0,0,1,2,2,1,3,8,5,8,6,8,7,8,11,
+                   8,14,6,7,6,6,10,8,9,4,2,9,4,14,8,8,10,11,
+                   12,11,21,8,2)
+times = 0:(length(waterloo_cases)-1)
+waterloo_df = data.frame(waterloo_cases, dates)
+waterloo_sampled <- as.matrix(data.frame( time=times, I=waterloo_cases))
+barplot(waterloo_cases, xlab="Date", names.arg=dates)
+```
+
+## Appendix C Codes
+
+### Import data
+```{r echo=TRUE, eval=FALSE}
+
+require(coronaModel)
+require(MLmetrics)
+library(reticulate)
+# Data sourced from Johns Hopkins dataset.
+data.infected <- read.csv("time_series_covid19_confirmed_global.csv", sep=",", header = TRUE)
+data.infected <- data.infected[data.infected[,"Country.Region"]=="Italy",]
+infected <- colSums(data.infected[,5:ncol(data.infected)])
+
+data.recovered <- read.csv("time_series_covid19_recovered_global.csv", sep=",", header = TRUE)
+data.recovered<- data.recovered[data.recovered[,"Country.Region"]=="Italy",]
+recovered <- colSums(data.recovered[,5:ncol(data.recovered)])
+
+data.death <- read.csv("time_series_covid19_deaths_global.csv", sep=",", header = TRUE)
+data.death <- data.death[data.death[,"Country.Region"]=="Italy",]
+death <- colSums(data.death[,5:ncol(data.death)])
+
+removed <- recovered + death
+
+# Assume a fixed population of 60.36 million in Italy
+N <- 60360000
+init_b = 0.25
+init_g = 1/16
+lower_g = 0.06
+upper_g = 0.07
+upper_b = 0.3
+min_init_I = 20
+max_init_R = 0
+
+ii = 1
+while (infected[ii] < min_init_I && removed[ii] <= max_init_R) {
+  ii = ii + 1
+}
+infected = infected[ii:length(infected)]
+death = death[ii:length(death)]
+recovered = recovered[ii:length(recovered)]
+removed = removed[ii:length(removed)]
+```
+
+### SIR Model
+
+```{r eval=FALSE, echo=TRUE}
+set.seed(2721)
+init_I = infected[1]
+init_R = removed[1]
+
+# Output the optimal parameters beta and gamma respectively
+opt_param <- sir_mle_param(init_b, init_g, lower_g, upper_g, upper_b, infected) # init beta, init gamma, lower_g, upper_g, upper_b
+
+# Calculate the R0 number
+R0.hat <- opt_param[1]/opt_param[2]
+
+# Use ode to find the predictions for the SIR model
+pred_ode <- sir_ode_fit(opt_param, c(1:length(infected)), N, N-init_I-init_R, init_I, init_R) # remove hardcode later TBD..
+
+# Use iterations to find the predictions for the SIR model
+pred <- sir_fit(length(infected), opt_param[1], opt_param[2], N - init_I, init_I, init_R, N)
+
+data <- list(I=infected,R=removed)
+loss_sir <- MSE(y_pred=pred$I, y_true=data$I)
+par(mfrow=c(1,2))
+sir_plot(pred, pred_ode, data)
+```
+
+### SEIRD Modified Model
+
+```{r eval=FALSE, echo=TRUE}
+os <- import("os")
+# use_python("/usr/local/bin/python3.7")
+# py_install("scipy")
+source_python('seir_main.py')
+res <- search_param(30000000, 1200, 25, infected, death, recovered) #init S, range of init E, step, confirmed data, death data, recovered data
+param <- res[1][[1]]
+E <- res[2][[1]]
+I <- infected[1]
+D <- death[1]
+C <- recovered[1]
+a1 = param$alpha1
+a2 = param$alpha2
+b = param$beta
+s = param$sigma
+g = param$gamma
+
+pred <- seird_m_fit(49,a1,a2,b,s,g,E, I, D, C, a1_dec_rate = 0.998, a2_dec_rate = 0.998)
+data <- list(I=infected, D=death, C=recovered)
+loss_seird <- MSE(y_pred = pred$I, y_true = data$I)
+par(mfrow=c(1,3))
+seird_m_plot(pred, data)
+
+####### Python codes #########
+import numpy as np
+from scipy.optimize import dual_annealing, minimize
+from collections import namedtuple
+
+SEIR_PARAM = namedtuple('SEIRparm', ['alpha1', 'alpha2', 'beta', 'sigma', 'gamma'])
+
+class SEIR(object):
+
+	def __init__(self, P=None):
+
+		self.P = P
+	# Each iteration to find the next set of parameters with modified SEIR model.
+	def forward(self, S, E, I, D, C, param, max_iter):
+		a1, a2, b, s, g = param
+		est = []
+		for t in range(max_iter):
+			S_ = S - a1 * E - a2 * I + s * I
+			E_ = E + a1 * E + a2 * I - b * E
+			I_ = I + b * E - s * I - g * I
+			D_ = D + g * I
+			C_ = C + s * I
+			S, E, I, D, C = S_, E_, I_, D_, C_
+			est.append([S, E, I, D, C])
+		return est
+
+	# Metric function that computes the log loss of real data and predicted data.
+	def logloss(self, obs, est):
+		assert len(obs) == len(est)
+		loss = ((np.log2(obs + 1) - np.log2(est + 1)) ** 2).sum()
+		self.lossing.append(loss)
+		return loss
+
+	# Metric function that computes the r2 score of real data and predicted data.
+	def r2_score(self, y_true, y_pred):
+		y_true = np.asarray(y_true)
+		y_pred = np.asarray(y_pred)
+		numerator = ((y_true - y_pred) ** 2).sum(axis=0,
+														  dtype=np.float64)
+		denominator = ((y_true - np.average(
+			y_true, axis=0, weights=None)) ** 2).sum(axis=0,
+															  dtype=np.float64)
+		return 1 - numerator / denominator
+
+	# Helper function that returns a list of data as a form of [confirmed, death, recovered]
+	# Input: data  -  a list of three lists containing confirmed data, death data and recovered data in each list.
+	def get_IDC(self, data):
+		res = []
+		for i in range(len(data)):
+			res.append([data[i][2], data[i][3], data[i][4]])
+		return res
+
+	# Optimized function that uses log loss to fit the model
+	def opt_fn(self, param, s, e, i, d, c, obs):
+		est = self.forward(s, e, i, d, c, param, len(obs))
+		return self.logloss(obs, np.asarray(self.get_IDC(est)))
+
+	# Fit the input data and find the best parameters with optimized function defined above
+	def fit(self, initS, initE, initI, initD, initC, Y):
+		self.lossing = []
+		args = (initS, initE, initI, initD, initC, np.asarray(Y))
+		param = [(0, 1), ] * 5
+		result = dual_annealing(self.opt_fn, param, args=args, seed=30, maxiter=10)['x']
+		self.P = SEIR_PARAM(*result)
+
+	# Convert rows data to three-column data (confirmed, death, recovered)
+	def get_column_data(self, rows):
+		col1 = []
+		col2 = []
+		col3 = []
+		for i in range(len(rows)):
+			col1.append(rows[i][0])
+			col2.append(rows[i][1])
+			col3.append(rows[i][2])
+		return col1, col2, col3
+
+	# Computer log loss and average r2 score
+	def score(self, initS, initE, initI, initD, initC, Y):
+		est = self.get_IDC(self.predict(initS, initE, initI, initD, initC, len(Y)))
+		loss = self.logloss(np.asarray(Y), np.asarray(est))
+
+		y1, y2, y3 = self.get_column_data(Y)
+		est1, est2, est3 = self.get_column_data(est)
+		r1 = self.r2_score(y1, est1)
+		r2 = self.r2_score(y2, est2)
+		r3 = self.r2_score(y3, est3)
+
+		return loss, (r1 + r2 + r3) / 3
+
+	# Make predictions for T days with initial values
+	def predict(self, initS, initE, initI, initD, initC, T):
+		return self.forward(initS, initE, initI, initD, initC, self.P, T)
+
+# Convert training data as column form
+def get_train_data(confirmed_data, death_data, recovered_data):
+	train = []
+	for i in range(len(confirmed_data)):
+		train.append([confirmed_data[i], death_data[i], recovered_data[i]])
+	return train
+
+# Main function that finds the best params (alpha1, alpha2, beta, sigma, gamma) and optimal initial E
+def search_param(init_S, init_E, step, confirmed, death, recovered):
+	seir = SEIR()
+	train = get_train_data(confirmed, death, recovered)
+	min_loss, max_r2, best_param, likeli_potential = float('inf'), float('-inf'), None, 0
+	for potential in range(0, int(init_E), int(step)):
+		seir.fit(int(init_S), potential, train[0][0], train[0][1], train[0][2], train)
+		loss, r2 = seir.score(int(init_S), potential, train[0][0], train[0][1],  train[0][2], Y=train)
+		if loss < min_loss and r2 > max_r2:
+			min_loss, max_r2, best_param, likeli_potential = loss, r2, seir.P, potential
+	seir.P = best_param
+	return best_param, likeli_potential
+	
+################ Python Test ###################	
+
+from seir_main import SEIR 
+import unittest
+import numpy as np
+from sklearn.metrics import r2_score
+
+# This is the unit test file to test the function in SEIR class.
+# Run: `python3 -m unittest test_sier_main.py` to run the tests.
+class TestSeir(unittest.TestCase):
+
+	def test_forward(self):
+		self.seir = SEIR()
+		S = 10000
+		E = 10
+		I = 100
+		D = 50
+		C = 100
+		param = [0.1,0.2,0.3,0.4,0.5]
+		iteration = 50
+		result = self.seir.forward(S,E,I,D,C,param,iteration)
+		self.assertEqual(len(result[0]), 5)
+		self.assertEqual(len(result), iteration)
+
+	def test_log_loss(self):
+		self.seir = SEIR()
+		y_pred = np.asarray([[1,2,3,4], [1,2,3,4],[2,2,3,4]])
+		y_true = np.asarray([[1,2,3,4], [1,3,2,4],[2,3,4,4]])
+		result = self.seir.logloss(y_true, y_pred)
+		self.assertEqual(round(result,6), 0.6204060)
+
+	def test_r2_score(self):
+		self.seir = SEIR()
+		y_pred = [[1,2,3,4], [1,2,3,4],[1,1]]
+		y_true = [[1,2,3,4], [1,3,2,4], [2,1]]
+		for i in range(len(y_pred)):
+			result = self.seir.r2_score(y_true[i], y_pred[i])
+			self.assertEqual(result, r2_score(y_true[i], y_pred[i]))
+
+	def test_get_column_data(self):
+		self.seir = SEIR()
+		rows = [[1,2,3], [1,2,3],[2,2,3],[4,5,6],[66,66,44]]
+		result = self.seir.get_column_data(rows)
+		self.assertEqual(len(result[0]), len(rows))
+		self.assertEqual(len(result), len(rows[0]))
+
+	def test_score(self):
+		self.seir = SEIR()
+		self.seir.P = (0.1,0.2,0.3,0.4,0.5)
+		S = 10000
+		E = 10
+		I = 100
+		D = 50
+		C = 100
+		Y = [[1,2,3], [1,2,3],[66,66,44]]
+		result = self.seir.score(S,E,I,D,C,Y)
+		self.assertEqual(len(result), 2)
+
+```
+
+### Stochastic SIR Model
+
+```{r eval=FALSE, echo=TRUE}
+initial_params_1500 <- list(beta=0.00015, mu=0.26, rho=0.09)
+epimodel_1500 <- best_parmas_finder(initial_params_1500, 
+                                    dat=waterloo_sampled, 
+                                    thres=4e-6, pop_size=1500)
+
+epimodel_1500$params
+plot_latent_posterior(epimodel_1500, 
+                      states = "I", times = epimodel$obstimes, cm = "mn")
+```
+
+```{r eval=FALSE, echo=TRUE}
+initial_params_2000 <- list(beta=0.00016, mu=0.26, rho=0.09)
+epimodel_2000 <- best_parmas_finder(initial_params_2000, 
+                                    dat=waterloo_sampled,
+                                    thres=4e-6, pop_size=2000)
+
+epimodel_2000$params
+plot_latent_posterior(epimodel_2000, 
+                      states = "I", times = epimodel$obstimes, cm = "mn")
+```
+
+
+```{r eval=FALSE, echo=TRUE}
+initial_params <- list(beta=0.00040, gamma=0.10, mu=0.03, rho=0.010)
+epimodel <- best_parmas_finder(initial_params, dat=waterloo_sampled, 
+                               SEIR=TRUE, thres=1e-5, pop_size=1500)
+```
+
+
+```{r eval=FALSE, echo=TRUE}
+initial_params <- list(beta=0.00040, gamma=0.10, mu=0.03, 
+                       rho=0.010, popsize=1500)
+epimodel <- best_parmas_finder(initial_params,
+                               dat=waterloo_sampled, SEIR=TRUE,
+                               thres=1e-5, pop_size=2000)
+```
 
 
