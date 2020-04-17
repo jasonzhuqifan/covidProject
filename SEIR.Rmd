@@ -43,6 +43,7 @@ removed = removed[ii:length(removed)]
 ```
 
 ```{r}
+set.seed(2721)
 init_I = infected[1]
 init_R = removed[1]
 
