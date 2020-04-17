@@ -103,7 +103,8 @@ sir_fit <- function(pred_days, beta, gamma, S, I, R, N){
 
 #' Plot SIR models on confirmed cases and removed cases.
 #'
-#' @param pred Prediction values of confirmed cases and removed cases. `(I, R)`.
+#' @param pred Iteration prediction values of confirmed cases and removed cases. `(I, R)`.
+#' @param pred_ode ODE prediction values of confirmed cases and removed cases. `(I, R)`.
 #' @param data True values of confirmed cases and removed cases. `(I, R)`.
 #' @details Plot the models of infection and removed cases seperately with prediction and real data.
 #' @return Two plots of infection cases and cremoved cases respectively.

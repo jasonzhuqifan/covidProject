@@ -7,7 +7,9 @@
 sir_plot(pred, pred_ode, data)
 }
 \arguments{
-\item{pred}{Prediction values of confirmed cases and removed cases. \verb{(I, R)}.}
+\item{pred}{Iteration prediction values of confirmed cases and removed cases. \verb{(I, R)}.}
+
+\item{pred_ode}{ODE prediction values of confirmed cases and removed cases. \verb{(I, R)}.}
 
 \item{data}{True values of confirmed cases and removed cases. \verb{(I, R)}.}
 }
