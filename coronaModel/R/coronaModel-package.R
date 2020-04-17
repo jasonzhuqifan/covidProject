@@ -10,4 +10,7 @@
 #' @import stats
 #' @import graphics
 #' @import deSolve
+#' @import Rcpp
+#' @import MCMCpack
+#' @import BDAepimodel
 NULL
