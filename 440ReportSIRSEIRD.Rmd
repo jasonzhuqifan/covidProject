@@ -261,6 +261,7 @@ To fit the model, we use the `fit_model` function to estimate the SEM parameters
 
 ### 3.3.1 SIR Model on Population Size of 1500 and 2000
 ![Density Distribution ](images/dist.jpeg)
+
 We also conducted experiments on SIR model with the population size of 2000 and 1500, which gives us the following density distribution of  $\hat{\beta}$, $\hat{\mu}$ and $\hat{\rho}$. It's quite clear that the model does not estimate similar parameters, which does not match the claim in the paper that given different population size, the posterior inferences about the epidemic dynamics are not substantially affected. The estimated parameters under 2000 population size can relatively accruate for the full population size (Fintzi, 2017).
 
 In the following experiment, we used the population size of 2000 and initial values of $\beta=0.00016$, $\mu=0.26$, $\rho=0.09$ and obtained estimated parameters of $\hat{\beta}=0.00015$, $\hat{\mu}=0.256$ and $\hat{\rho}=0.118$ and obtained $0.00015$,$0.186$ and $0.205$. When we set the population size of 1500, the parameters we obtained are $\hat{\beta}=0.00016$, $\hat{\mu}=0.254$, and $\hat{\rho}=0.133$ 
@@ -278,8 +279,6 @@ In the following experiment, we used the population size of 2000 and initial val
 ![Simulated Data for SEIR and SIR Model](images/dist3.jpeg)
 
 We'd also like to note the SIR and SEIR seems to focus on different aspect of the infected people. The mean squared error for SEIR is 23.83 and the mean squared error for SIR is 36.87. The SEIR model has a better fit for earlier data, but it also indicates there will be a significant boost of the infected people around the 40th day; however, this situation did not happen in the real case, possibly because of the effective quanrantine order in place. The SIR model on the other hand, the parameter $\rho$ - the ratio of the people who are infected and also tested - seems to have a stronger influence on the simulation result at the early stage, but the case count plateaus in the long run. Judging by the data provided by Region of Waterloo, the number of infected people seems to fit the stochastic SIR model better.
-
-\newline
 
 # 4. Discussion
 Coming back to these three compartmental models respectively, first, the basic SIR model lays down a foundation for studying how COVID-19 evolves. It relies on the assumptions that the population is well-mixed and closed and individual characteristics of transmissibility and ability to recover are the same for all population. This model has a lot of room for improvement as it first oversimplifies the problem by only dividing the population into three groups in terms of two fixed parameters that are supposed to change due to externalities over time. Second, the initial inputs required for parameter estimation might bring in initial error that can affect the latter MLE. Moreover, this model does not converge to an disease-free equilibrium when R0is greater than 1. \bigskip
@@ -718,5 +717,7 @@ set.seed(2001)
 simulation_plot(epimodel_2000, orig_data = waterloo_sampled)
 simulation_plot(epimodel, orig_data = waterloo_sampled, SEIR=TRUE )
 ```
+
+
 
 
