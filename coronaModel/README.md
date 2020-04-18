@@ -15,5 +15,5 @@ library(devtools)
 install_github("fintzij/ECctmc")
 install_github("fintzij/BDAepimodel") 
 ```
-The library may take some time to download.
+The libraries may take some time to download.
 

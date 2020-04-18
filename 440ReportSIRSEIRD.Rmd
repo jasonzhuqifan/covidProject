@@ -295,18 +295,9 @@ The stochastic SEIR and SIR
 
 
 One other drawback is we cannot find a set of suitable parameters with completely randomly generated parameters, we have to start with an educated guess which will at least give a non-zero probability after the initialization step.
+\newpage
 
-# 5. References
-
-Allen, L. (1999, August 25). Comparison of deterministic and stochastic SIS and SIR models in discrete time [PDF File]. Lubbock: Texas Tech University.\newline
-Aron, Joan & Schwartz, Ira. (1984). Seasonality and period-doubling bifurcations in an epidemic model. Journal of theoretical biology. 110. 665-79. 10.1016/S0022-5193(84)80150-2.\newline
-Centers of Disease Control and Prevention (n.d.). Coronavirus disease 2019 (COVID-19) and you. Retrieved April 17, 2020 from https://www.cdc.gov/coronavirus/2019-ncov/downloads/2019-ncov-factsheet.pdf\newline
-Höhle, M. (2015, November). Temporal and Spatio-Temporal Modelling and Monitoring of Infectious Diseases [PDF File]. Stockholm, Sweden: Stockholm University.\newline 
-IDM. (n.d.). SIR and SIRS models. Retrieved April 17, 2020, from https://idmod.org/docs/general/model-sir.html \newline
-Jones, J. (2007, May 1). Notes On R0 [PDF File](p. 2). Stanford, California: Stanford University. Retrieved April 17, 2020 from https://web.stanford.edu/~jhj1/teachingdocs/Jones-on-R0.pdf \newline
-Koehrsen, W. (2018, January 28). Overfitting vs. Underfitting: A Complete Example. Retrieved from https://towardsdatascience.com/overfitting-vs-underfitting-a-complete-example-d05dd7e19765
-
-# 6. Appendices
+# 5. Appendices
 
 ## Appendix A SEIR Model
 
@@ -718,6 +709,30 @@ simulation_plot(epimodel_2000, orig_data = waterloo_sampled)
 simulation_plot(epimodel, orig_data = waterloo_sampled, SEIR=TRUE )
 ```
 
+\newpage
 
+# 6. References
 
+Allen, L. (1999, August 25). Comparison of deterministic and stochastic SIS and SIR models in discrete time [PDF File]. Lubbock: Texas Tech University.\newline \newline
+
+Aron, Joan & Schwartz, Ira. (1984). Seasonality and period-doubling bifurcations in an epidemic model. Journal of theoretical biology. 110. 665-79. 10.1016/S0022-5193(84)80150-2.\newline \newline
+
+Centers of Disease Control and Prevention (n.d.). Coronavirus disease 2019 (COVID-19) and you. Retrieved April 17, 2020 from https://www.cdc.gov/coronavirus/2019-ncov/downloads/2019-ncov-factsheet.pdf\newline \newline
+
+Höhle, M. (2015, November). Temporal and Spatio-Temporal Modelling and Monitoring of Infectious Diseases [PDF File]. Stockholm, Sweden: Stockholm University.\newline \newline
+IDM. (n.d.). SIR and SIRS models. Retrieved April 17, 2020, from https://idmod.org/docs/general/model-sir.html \newline \newline
+
+Jonathan Fintzi, Xiang Cui, Jon Wakefield & Vladimir N. Minin (2017) Efficient Data Augmentation for Fitting Stochastic Epidemic Models to Prevalence Data, Journal of Computational and Graphical Statistics, 26:4, 918-929, DOI: 10.1080/10618600.2017.1328365 \newline \newline
+
+Jones, J. (2007, May 1). Notes On R0 [PDF File](p. 2). Stanford, California: Stanford University. Retrieved April 17, 2020 from https://web.stanford.edu/~jhj1/teachingdocs/Jones-on-R0.pdf \newline \newline
+
+Koehrsen, W. (2018, January 28). Overfitting vs. Underfitting: A Complete Example. Retrieved from https://towardsdatascience.com/overfitting-vs-underfitting-a-complete-example-d05dd7e19765 \newline \newline
+
+Lauer, S. A., Grantz, K. H., Bi, Q., Jones, F. K., Zheng, Q., Meredith, H. R., … Lessler, J. (2020, March 10). The Incubation Period of Coronavirus Disease 2019 (COVID-19) From Publicly Reported Confirmed Cases: Estimation and Application. Retrieved from https://annals.org/aim/fullarticle/2762808/incubation-period-coronavirus-disease-2019-covid-19-from-publicly-reported \newline \newline
+
+Moulds, J. (2020, March 23). People with mild or no symptoms could be spreading COVID-19. Retrieved from https://www.weforum.org/agenda/2020/03/people-with-mild-or-no-symptoms-could-be-spreading-covid-19/ \newline \newline
+
+World Health Organization (2020, February). Report of the WHO-China Joint Mission on Coronavirus Disease 2019 (COVID-19). Retrieved April 17, 2020 from https://www.who.int/docs/default-source/coronaviruse/who-china-joint-mission-on-covid-19-final-report.pdf \newline \newline
+
+World Health Organization (2020, March 12). Coronavirus disease 2019 (COVID-19) Situation Report – 52. Retrieved April 17, 2020 from https://www.who.int/docs/default-source/coronaviruse/20200312-sitrep-52-covid-19.pdf?sfvrsn=e2bfc9c0_2
 
