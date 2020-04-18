@@ -151,8 +151,8 @@ This emission probability will depend on only the subject $j$ is infected at tim
 In this step, we first sample the state when the time-inhomogeneous CTMC changes its rate and then sample the full path within each interevent interval. Consider an inter-observation interval, $I_t =[t_{l-1}, t_l]$, containing interevent intervals whose endpoints are given by times $t_{l-1}=\tau_{l,0}^{(-j)}<\tau_{l,1}^{(-j)}<... <\tau_{l,n-1}^{(-j)}<\tau_{l,n}^{(-j)} \equiv t_l$ . Let $\tau =\tau_{l,1}^{(-j)}$ and $x_i=x_j(\tau_{l,1}^{(-j)})$, sample $X_j$ at each intermediate event time, beginning at $\tau_1$, from the discrete distribution with masses.
 
 
-$$Pr(X_j(\tau_i) = x_i | X_j(\tau_{i-1} = x_{i-1}, X_j(\tau_n) = x_n)) \
-= \frac{[P^{(j)(\tau_{i-1}, \tau_i)}]_{x_{i-1}, x_i}[\prod_{k=1}^{n-1} P^{(j)(\tau_k, \tau_{k+1})}]_{x_i, x_n}}{[\prod_{k=1}^{n-1}P^{(j)}(\tau_k, \tau_{k+1})]_{x_{i-1}, x_n}}$$
+$$Pr(X_j(\widetilde{\tau_i}) = x_i | X_j(\widetilde{\tau}_{i-1} = x_{i-1}, X_j(\widetilde{\tau}_n) = x_n)) \
+= \frac{[P^{(j)}(\widetilde{\tau}_{i-1}, \widetilde{\tau}_i)]_{x_{i-1}, x_i}[\prod_{k=1}^{n-1} P^{(j)}(\widetilde{\tau}_k, \widetilde{\tau}_{k+1})]_{x_i, x_n}}{[\prod_{k=1}^{n-1}P^{(j)}(\widetilde{\tau}_k, \widetilde{\tau}_{k+1})]_{x_{i-1}, x_n}}$$
   
 ### 2.3.3 Event Time Step
 During this final step, we will sample the exact infection and recovery times, by building a subject path from the sequence of states from the previous two steps. When fitting the SIR model, we choose to use a variation of modified Gillespie’s direct algorithm rejection sampling to avoid sampling constant paths. The stochastic SEIR model uses a uniformization-based sampling for a more robust sampling of paths in intervals with multiple transitions.
