@@ -81,7 +81,7 @@ $$
 \end{aligned}
 $$
 
-Stochastic epidemic models (SEM), on the other hand, allows for more dynamic and realistic assumptions. For example, it assumes the transition from one compartment to another is discrete, whereas the SIR and SEIR models described above are discrete. The stochastic SIR model implemented in this report tolerates the partial observability of infected data. However, the parameters of stochastic SIR model, such as per-contact infectivity rate and recovery rate, are more difficult to estimate. In 2017, Fintzi et al. proposed an agent-based decision analysis Markov chain Monte Carlo (MCMC) framework for fitting SEMs time-series count data. This agent-based model completes the subject-level infection history, through an MCMC that targets the joint posterior distribution of the latent epidemic process and model parameters. Conditionally on the historical disease data of one individual and rates given by other individuals, the model proposes a subject-path for each individual by a time-inhomogeneous continuous-time Markov chain. Compared to other previous models, this model is more robust to missing data and allows for more efficient purtations to the latent epidemic paths. 
+Stochastic epidemic models (SEM), on the other hand, allows for more dynamic and realistic assumptions. For example, it assumes the transition from one compartment to another is discrete, whereas the SIR and SEIR models described above are discrete. The stochastic SIR model implemented in this report is robust to the partial observability of infected data. However, the parameters of stochastic SIR model, such as per-contact infectivity rate and recovery rate, are more difficult to estimate. In 2017, Fintzi et al. proposed an agent-based decision analysis Markov chain Monte Carlo (MCMC) framework for fitting SEMs time-series count data. This agent-based model completes the subject-level infection history, through an MCMC that targets the joint posterior distribution of the latent epidemic process and model parameters. Conditionally on the historical disease data of one individual and rates given by other individuals, the model proposes a subject-path for each individual by a time-inhomogeneous continuous-time Markov chain. Compared to other previous models, this model is more robust to missing data and allows for more efficient purtations to the latent epidemic paths (Fintzi, 2017). 
 
 # 2. Methodology
 ## 2.1 Deterministic SIR Model
@@ -101,15 +101,14 @@ Let $Y_i=(S(t_i), E(t_i),I(t_i), R(t_i), D(t_i)$ denote the random variables for
 1. Since it is not feasible to obtain the actual $E_0$, we make an assumption for $E_0$ based on the corresponding $I_{14}$. In general, some symptoms may take 14 days to appear. This is the longest known incubation period for COVID-19 (Lauer et al., 2020). Therefore, we first set a range for $E_0$ with a lower bound of 0 and an upper bound equals $I_{14}$, and then generate a set of $E_0$ from the given range with a customized increment each time. The increment is solely for saving runtime, as $I_{14}$ could be quite large for some countries.
 2. We then input each $E_0$ together with the real dataset to generate parameters $\alpha_1$, $\alpha_2$, $\beta$, $\sigma$ and $\gamma$. We also assign a function to $\alpha_1$ and $\alpha_1$ respectively to improve the flexibility of the model. The set of parameters that has the minimum log loss between the real data and the predicted data, or the maximum average R score will be returned.
 
-## 2.3 Stochastic SIR Model
+## 2.3 Stochastic SIR and SEIR model Model
 
-Data augmentation (BDA) in the context of fitting a stochastic SIR model to binomially distributed prevalence. We assume the detected cases follow a binomial distribution, where $Y={Y_1,..., Y_L}$ denotes the disease prevalence counts recorded at times $t_1,...,t	_L\in[t_1,t_L]$. Since the infectious numbers are often partially observable, we assume the possibility of observing a true prevalence at each observation time as $Y_l|I_{t_l} \sim Binomial (I_{t_l},)$. We then propose  $X(\tau)={X_1(\tau),..., X_N(\tau)}$, where $X(\tau)$ is a configuration of the realized subject-path in one of S, I, R state at time. Let be the infectivity parameter, be the recovery rate, be the sampling probability and $p_{t_1}$be the probability of a patient is in state S, I or R at the beginning. We then have the complete data likelihood
+Data augmentation (BDA) in the context of fitting a stochastic SIR and SEIR models to binomially distributed prevalence. We assume the detected cases follow a binomial distribution, where $Y={Y_1,..., Y_L}$ denotes the disease prevalence counts recorded at times $t_1,...,t	_L\in[t_1,t_L]$. Since the infectious numbers are often partially observable, we assume the possibility of observing a true prevalence at each observation time as $Y_l|I_{t_l} \sim Binomial (I_{t_l},)$. We then propose  $X(\tau)={X_1(\tau),..., X_N(\tau)}$, where $X(\tau)$ is a configuration of the realized subject-path in one of S, I, R state at time. Let be the infectivity parameter, be the recovery rate, be the sampling probability and $p_{t_1}$be the probability of a patient is in state S, I or R at the beginning. We then have the complete data likelihood
 
 $$L(X, Y | \theta) = Pr(Y|X, \rho) \times Pr(X(t_1)|p_{t_1}) \times \pi(X|X(t_1), \beta, \mu)$$
 
-The Subject-Path Proposal Framework
+### 2.3.1 The Subject-Path Proposal Framework
 Since the observed data likelihood in the posterior $\pi(\theta|Y) 	\propto \pi(Y|\theta)\pi(\theta)$ is intractable, we used data augmentation methods to introduce the subject-paths, $X$, as latent variables in the model, where the joint posterior distribution is 
-
 
 $$\pi(\theta,X|Y) \propto Pr(Y|X(t_1), \rho) \times Pr(Y|X(t_1),\beta,\mu) \times Pr(Y|X(t_1)|p_{t_1}) \times \pi(\beta)\pi(\mu)\pi(p_{t_1}). $$
   
@@ -125,9 +124,8 @@ $$\Lambda_m^{(-j)}(\theta) = \begin{pmatrix}-\beta I_{\tau_m}^{(-j)} & \beta I_{
 
 The the transtition probability matrix for subject j over $I_m$ is
 
-
 $$P^{(j)}(\tau_{m-1}, \tau_m) = (P_{a,b}^{(j)}(\tau_{m-1}, \tau_m))_{a,b \in S_j} = exp[(\tau_m-\tau_{m-1})\Lambda_m^{(-j)}(\theta)] $$
-Then, the time-inhomogeneous CTMC density over the observation period is 
+and the time-inhomogeneous CTMC density over the observation period is 
 
 $$\pi(X_j|\Lambda^{(-j)};I) = Pr(X_j(t_1)|p_{t_1}) \times \prod_{m=1}^{M} \pi(X_j|x_j(\tau_{m-1}),\Lambda_m^{(-j)}(\theta);I_m) .$$
   
@@ -141,38 +139,32 @@ The MCMC algorithm for constructing a subject-path proposal proceeds in three st
 - Discrete time skeleton step: sample the state at times when the time-inhomogeneous CTMC rates change, conditional on the sates sampled in the HMM step.
 - Event time step: sample the exact times of transition events conditional on the sequence of states sampled in the previous step.
 
-### The Hidden Markov Model Step 
+### 2.3.2 The Hidden Markov Model Step 
 
-Rewriting the probability of the infectious people got tested
-
+In this step, we sample the disease state of a subject from observation times, contional on the data and disease histories. Rewriting the probability of the infectious people got tested
 
 $$Y_l|X_j(t_l), I_{t_l}^{(-j)}, \rho \sim  Binomial(\mathbb{I} (X_j(t_l)=I ) +I_{t_l}^{(-j)} ,\rho)$$
   
-  This emission probability will depend on only the subject $j$ is infected at time $t_l$, since we assume the parameters and other subjects are fixed. as the current state only depends on the previous state, a hidden Markov model is used to model the distribution of $X$ and $Y$. We sample the discrete path of $X_j$ from $(X_j|Y, x_{(-j)}, \theta, ; t_1,...,t_L)$ using a stochastic forward-backward algorithm.
+This emission probability will depend on only the subject $j$ is infected at time $t_l$, since we assume the parameters and other subjects are fixed. as the current state only depends on the previous state, a hidden Markov model is used to model the distribution of $X$ and $Y$. We sample the discrete path of $X_j$ from $(X_j|Y, x_{(-j)}, \theta, ; t_1,...,t_L)$ using a stochastic forward-backward algorithm.
 
-### The Discrete Time Skeleton Step 
-We first sample the disease state at the intermediate event times when the CTMC rates change, and then sampling the full path within each interevent interval. Consider an interobservation interval, $I_t =[t_{l-1}, t_l]$, containing interevent intervals whose endpoints are given by times $t_{l-1}=\tau_{l,0}^{(-j)}<\tau_{l,1}^{(-j)}<... <\tau_{l,n-1}^{(-j)}<\tau_{l,n}^{(-j)} \equiv t_l$ . Let $\tau =\tau_{l,1}^{(-j)}$ and $x_i=x_j(\tau_{l,1}^{(-j)})$, sample $X_j$ at each intermediate event time, beginning at $\tau_1$, from the discrete distribution with masses.
-
+### 2.3.2 The Discrete Time Skeleton Step 
+In this step, we first sample the state when the time-inhomogeneous CTMC changes its rate and then sample the full path within each interevent interval. Consider an inter-observation interval, $I_t =[t_{l-1}, t_l]$, containing interevent intervals whose endpoints are given by times $t_{l-1}=\tau_{l,0}^{(-j)}<\tau_{l,1}^{(-j)}<... <\tau_{l,n-1}^{(-j)}<\tau_{l,n}^{(-j)} \equiv t_l$ . Let $\tau =\tau_{l,1}^{(-j)}$ and $x_i=x_j(\tau_{l,1}^{(-j)})$, sample $X_j$ at each intermediate event time, beginning at $\tau_1$, from the discrete distribution with masses.
 
 
 $$Pr(X_j(\tau_i) = x_i | X_j(\tau_{i-1} = x_{i-1}, X_j(\tau_n) = x_n)) \
 = \frac{[P^{(j)(\tau_{i-1}, \tau_i)}]_{x_{i-1}, x_i}[\prod_{k=1}^{n-1} P^{(j)(\tau_k, \tau_{k+1})}]_{x_i, x_n}}{[\prod_{k=1}^{n-1}P^{(j)}(\tau_k, \tau_{k+1})]_{x_{i-1}, x_n}}$$
   
-### Event Time Step
-The final step in constructing a subject-path is to sample the exact infection and recovery times given the discrete sequence of states obtained in the previous two steps. When fitting the SIR model, we choose to use modified rejection sampling, a modification of Gillespie’s direct algorithm that explicitly avoids simulating constant paths. The SEIR model uses a uniformization-based sampling for a more robust sampling of paths in intervals with multiple transitions.
+### 2.3.3 Event Time Step
+During this final step, we will sample the exact infection and recovery times, by building a subject path from the sequence of states from the previous two steps. When fitting the SIR model, we choose to use a variation of modified Gillespie’s direct algorithm rejection sampling to avoid sampling constant paths. The stochastic SEIR model uses a uniformization-based sampling for a more robust sampling of paths in intervals with multiple transitions.
 
 
-### Metropolis-Hasting Step
-After building a subject-path proposal, we then use metropolis-hasting to accept or reject the subject-path proposal. Since the distribution of the real $X_j|x_{(-j)}$,is not tractable or Markovian, we use the distribution of $\pi(X|Y) \propto \pi(Y|X)\pi(Y)$. We accept a proposed subject-path with probability
+### 2.3.4 Metropolis-Hasting Step
+After building a subject-path proposal, we then use Metropolis-Hasting to accept or reject the subject-path proposal. Since the distribution of the real $X_j|x_{(-j)}$,is not tractable or Markovian, we use the distribution of $\pi(X|Y) \propto \pi(Y|X)\pi(Y)$. We accept a proposed subject-path with probability
 
 $$a_{x^{curr} \to x^{new}}=min\{ \frac{\pi (x^{new})\pi (x_j^{curr})|\Lambda^{(-j)};I)} {\pi(x^{cur})(x_j^{new}|\Lambda{(-j)};I)}, 1\}$$
 
-### Initializing the Collection of Subject Path
-The initialization of the subject-paths starts with using Gillespie’s direct algorithm to simulate paths and iterates the algorithm until we have found one probable collection with nonzero probability.
-
-
-### Parameter Updates
-One MCMC iteration updates subject-path and parameters consecutively, this is because only updating subject-path or parameters will cause high auto-correlation. We then use Gibbs sampling to draw new parameter values from their univariate full conditional distributions. 
+### Initialization the Collection of Subject-path
+The initialization of the subject-paths starts with using the modified Gillespie’s direct algorithm to simulate paths and iterates the algorithm until we have found one probable collection with nonzero probability. We updates the model paramters from each MCMC iteration, which updates subject-path and parameters consecutively. The model updates both of the parameters and subject-path because only updating subject-path or parameters will cause high auto-correlation. We then use Gibbs sampling to draw new parameter values from their univariate full conditional distributions (Fintzi, 2017).
 
 # 3. Results
 ## 3.1 Deterministic SIR model
@@ -254,7 +246,7 @@ The initial state probability parameters are sampled through Dirichlet-Multinomi
 
 - `states`: Categorical vector for the states. We use ```c("S", "I", "R")``` for the SIR model and ```c("S", "E", "I", "R")``` for the SEIR model.
 
-- `params`: Named numeric vector of model parameters. The parameters include the values for per-contact infectivity, recovery rate, and binomial sampling probability for SIR model and one extra parameter gamma for SEIR model. The parameters also include the intial values for each compartments, which are denoted as S0, I0, E0, and R0. We use the following as the initial probability: $\beta=0.00016$, $\mu=0.26$, $\rho=0.09$, $popsize=1500$ 
+- `params`: Named numeric vector of model parameters. The parameters include the values for per-contact infectivity, recovery rate, and binomial sampling probability for SIR model and one extra parameter gamma for SEIR model. The parameters also include the intial values for each compartments, which are denoted as S0, I0, E0, and R0. One example is $\beta=0.00016$, $\mu=0.26$, $\rho=0.09$, $popsize=1500$ 
   
 - `rates`:  Vector of strings that state how to compute the *unlumped* rates for each type of transition. See the supplement of Fintzi, Wakefield, and Minin (2016) for a discussion of the distinction between lumped and unlumped rates. We use ```c("beta * I", "mu")```
 
@@ -266,13 +258,27 @@ The initial state probability parameters are sampled through Dirichlet-Multinomi
 
 To fit the model, we use the `fit_model` function to estimate the SEM parameters. During the actual practice, it's not always easy to find the best parameter, so we wrote an utility function that checks if the difference of the parameter we passed in and the average of `n` iterations of the model is less than a threshold.
 
-![alt text here](images/dist.jpeg)
 
-![alt text here](images/dist2.jpeg)
+### 3.3.1 SIR Model on Population Size of 1500 and 2000
+![Density Distribution ](images/dist.jpeg)
+We also conducted experiments on SIR model with the population size of 2000 and 1500, which gives us the following density distribution of  $\hat{\beta}$, $\hat{\mu}$ and $\hat{\rho}$. It's quite clear that the model does not estimate similar parameters, which does not match the claim in the paper that given different population size, the posterior inferences about the epidemic dynamics are not substantially affected. The estimated parameters under 2000 population size can relatively accruate for the full population size (Fintzi, 2017).
 
-![alt text here](images/dist3.jpeg)
+In the following experiment, we used the population size of 2000 and initial values of $\beta=0.00016$, $\mu=0.26$, $\rho=0.09$ and obtained estimated parameters of $\hat{\beta}=0.00015$, $\hat{\mu}=0.256$ and $\hat{\rho}=0.118$ and obtained $0.00015$,$0.186$ and $0.205$. When we set the population size of 1500, the parameters we obtained are $\hat{\beta}=0.00016$, $\hat{\mu}=0.254$, and $\hat{\rho}=0.133$ 
 
-![alt text here](images/dist4.jpeg)
+
+![Estimated Beta for SIR and SEIR Model](images/dist4.jpeg)
+
+
+### 3.3.2 SEIR Model on Population Size of 2000
+In the following experiment, we used the population size of 2000 and initial values of $\beta=0.00040$,$\gamma=0.10$, $\mu=0.03$, $\rho=0.01$ and obtained estimated parameters of $\hat{\beta}=0.00038$, $\gamma=0.091$, $\hat{\mu}=0.030$ and $\hat{\rho}=0.118$
+
+
+![Histogram for Sampled Mu, Rho and Gamma for SEIR Model](images/dist2.jpeg)
+
+![Simulated Data for SEIR and SIR Model](images/dist3.jpeg)
+
+We'd also like to note the SIR and SEIR seems to focus on different aspect of the infected people. The mean squared error for SEIR is 23.83 and the mean squared error for SIR is 36.87. The SEIR model has a better fit for earlier data, but it also indicates there will be a significant boost of the infected people around the 40th day; however, this situation did not happen in the real case, possibly because of the effective quanrantine order in place. The SIR model on the other hand, the parameter $\rho$ - the ratio of the people who are infected and also tested - seems to have a stronger influence on the simulation result at the early stage, but the case count plateaus in the long run. Judging by the data provided by Region of Waterloo, the number of infected people seems to fit the stochastic SIR model better.
+
 \newline
 
 # 4. Discussion
@@ -286,7 +292,8 @@ $$\frac{d}{dt}P(t) = \Lambda P(t), \ s.t. P(0) = I$$
 
 The $P = exp(t\Lambda)$ is the most intensive step in the algorithm, since it will calcuate $P$ for every partitioned time intervals. The research paper implemented a method to cache the result eigenvalues and eigenvectors, as the exponetialization of a matrix will be applied to the same rate matrix. Also, the method in this paper solves the problem that with absent data on the progression of the virus, the complicated latent variable can cause the state size to grow large when the population increases, by updating the subject-level paths. Since we have to track the all the subject-paths, the overall runtime will be negatively influenced by the computational overhead. The paper also states the MCMC algorithm is coded for reliability and MCMC mixing can be too slow in a large population for practical use. 
 
-Although using the full population will result in a long run-time, the research paper conducted an experiment under population misspecification. Given different population size, the posterior inferences about the epidemic dynamics are not substantially affected. The estimated parameters under 2000 population size can relatively accruate for the full population size.
+The stochastic SEIR and SIR 
+
 
 One other drawback is we cannot find a set of suitable parameters with completely randomly generated parameters, we have to start with an educated guess which will at least give a non-zero probability after the initialization step.
 
@@ -616,18 +623,26 @@ class TestSeir(unittest.TestCase):
 
 ### Stochastic SIR Model
 
-```{r eval=FALSE, echo=TRUE}
-initial_params_1500 <- list(beta=0.00015, mu=0.26, rho=0.09)
+```{r eval=FALSE}
+
+require(ggplot2)
+require(Rcpp)
+require(MCMCpack)
+require(BDAepimodel)
+require(coronaModel)
+set.seed(58267)
+
+initial_params_1500 <- list(beta=0.00016, mu=0.26, rho=0.09)
 epimodel_1500 <- best_parmas_finder(initial_params_1500, 
-                                    dat=waterloo_sampled, 
+                                    dat=waterloo_sampled,
                                     thres=4e-6, pop_size=1500)
 
 epimodel_1500$params
 plot_latent_posterior(epimodel_1500, 
-                      states = "I", times = epimodel$obstimes, cm = "mn")
-```
+                      states = "I", times = epimodel_1500$obstimes, cm = "mn")
 
-```{r eval=FALSE, echo=TRUE}
+
+set.seed(58267)
 initial_params_2000 <- list(beta=0.00016, mu=0.26, rho=0.09)
 epimodel_2000 <- best_parmas_finder(initial_params_2000, 
                                     dat=waterloo_sampled,
@@ -635,23 +650,73 @@ epimodel_2000 <- best_parmas_finder(initial_params_2000,
 
 epimodel_2000$params
 plot_latent_posterior(epimodel_2000, 
-                      states = "I", times = epimodel$obstimes, cm = "mn")
-```
+                      states = "I", times = epimodel_2000$obstimes, cm = "mn")
 
 
-```{r eval=FALSE, echo=TRUE}
-initial_params <- list(beta=0.00040, gamma=0.10, mu=0.03, rho=0.010)
-epimodel <- best_parmas_finder(initial_params, dat=waterloo_sampled, 
-                               SEIR=TRUE, thres=1e-5, pop_size=1500)
-```
+apply(epimodel_1500$results$params, 2, get_avg)
+
+apply(epimodel_2000$results$params, 2, get_avg)
 
 
-```{r eval=FALSE, echo=TRUE}
+ts.plot(epimodel_1500$results$params[,"beta"],
+        ylab = expression(beta), 
+        main="Infectivity Rate at Population Size of 1500 and 2000",
+        col="red", ylim=c(0.000095, 0.00020))
+lines(epimodel_2000$results$params[,"beta"],
+      ylab = expression(beta), 
+      main="Infectivity Rate at Population Size of 1500 and 2000",
+      col="blue", lty=6)
+legend("topleft", legend=c("Epimodel_1500", "Epimodel_2000"),
+       col=c("red", "blue"), lty=1:6)
+
+
+epimodel_1500_mu = data.frame(epimodel_ind = epimodel_1500$results$params[,"mu"])
+epimodel_2000_mu = data.frame(epimodel_ind = epimodel_2000$results$params[,"mu"])
+epimodel_1500_mu$lab = "epimodel_1500"
+epimodel_2000_mu$lab = "epimodel_2000"
+mu_plots <- rbind(epimodel_1500_mu, epimodel_2000_mu )
+p1 <- ggplot(mu_plots, aes(epimodel_ind, fill = lab)) + 
+        geom_density(alpha = 0.2) + 
+        xlim(0.06, 0.30) +
+        ggtitle("Distribution of mu with Population Size of 1500 and 2000")
+p1 + theme_minimal()
+
+epimodel_1500_rho = data.frame(epimodel_ind = epimodel_1500$results$params[,"rho"])
+epimodel_2000_rho = data.frame(epimodel_ind = epimodel_2000$results$params[,"rho"])
+epimodel_1500_rho$lab = "epimodel_1500"
+epimodel_2000_rho$lab = "epimodel_2000"
+rho_plots <- rbind(epimodel_1500_rho, epimodel_2000_rho )
+p2 <- ggplot(rho_plots, aes(epimodel_ind, fill = lab)) +
+          geom_density(alpha = 0.2) +
+          xlim(0.01, 0.2) +
+          ggtitle("Distribution of rho with Population Size of 1500 and 2000")
+p2 + theme_minimal()
+
+
+grid.arrange(p1, p2, ncol=2)
+
+
+
 initial_params <- list(beta=0.00040, gamma=0.10, mu=0.03, 
-                       rho=0.010, popsize=1500)
+                       rho=0.010, popsize=2000)
 epimodel <- best_parmas_finder(initial_params,
                                dat=waterloo_sampled, SEIR=TRUE,
                                thres=1e-5, pop_size=2000)
+plot_latent_posterior(epimodel_1500, 
+                      states = "I", times = epimodel_1500$obstimes, cm = "mn")
+
+apply(epimodel$results$params,2, get_avg)
+
+epimodel_gamma  = data.frame(epimodel_param= epimodel$results$params[,"gamma"])
+epimodel_mu = data.frame(epimodel_param = epimodel$results$params[,"mu"])
+epimodel_rho = data.frame(epimodel_param = epimodel$results$params[,"rho"])
+hist(epimodel_gamma$epimodel_param, main="Histogram of Gamma for SEIR Model", xlab="Gamma")
+hist(epimodel_mu$epimodel_param, main="Histogram of Mu for SEIR Model", xlab="Mu")
+hist(epimodel_rho$epimodel_param, main="Histogram of Rho for SEIR Model", xlab="Rho")
+
+set.seed(2001)
+simulation_plot(epimodel_2000, orig_data = waterloo_sampled)
+simulation_plot(epimodel, orig_data = waterloo_sampled, SEIR=TRUE )
 ```
 
 
