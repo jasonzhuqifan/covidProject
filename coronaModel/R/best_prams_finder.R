@@ -50,7 +50,7 @@ best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100,
                                 niter = niter,  # this was set to 100,000 in the paper
                                 save_params_every = 1,
                                 save_configs_every = 250, # this was set to 250 in the paper
-                                kernel = list(gibbs_kernel_SIR),
+                                kernel = list(gibbs_SIR),
                                 configs_to_redraw = 20, # this was set to 75 in the paper
                                 analytic_eigen = "SIR", # compute eigen decompositions and matrix inverses analytically
                                 ecctmc_method = "unif") # sample subject paths in interevent intervals via modified rejection sampling

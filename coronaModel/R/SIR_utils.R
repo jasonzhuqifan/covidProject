@@ -3,8 +3,11 @@ require(MCMCpack)
 require(BDAepimodel)
 
 Rcpp::cppFunction("Rcpp::NumericVector getSuffStats_SIR(const Rcpp::NumericMatrix& pop_mat, const int ind_final_config) {
-                  // Function to update beta and mu
-                  // initialize sufficient statistics
+                  //' Function to update beta and mu
+                  //'
+                  //' @param pop_mat the population matrix
+                  //' @param ind_final_config the final observation time
+                  // [[Rcpp:export]]
                   int num_inf = 0;       // number of infection events
                   int num_rec = 0;       // number of recovery events
                   double beta_suff = 0;  // integrated hazard for the infectivity
