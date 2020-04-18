@@ -5,14 +5,14 @@ simulation_plot <- function(epimodel, orig_data, SEIR=FALSE){
   #' @param orig_data the original data set to compare
   #' @param SEIR whether the model is an SEIR (TRUE) or SIR(FALSE) model. Default: FALSE
   #' @return none, but will print the comparison plots
-  #' @export 
-  #' 
+  #' @export
+  #'
   params = as.numeric(epimodel$avg_params)
   set.seed(52787)
   # print (params)
   if (!SEIR){
     dat = epimodel$dat
-    init_dist <- MCMCpack::rdirichlet(1, c(9,0.5,0.1)) 
+    init_dist <- MCMCpack::rdirichlet(1, c(9,0.5,0.1))
     epimodel <- init_epimodel(obstimes = seq(0, 100, by = 1),     # vector of observation times
                               popsize = 2000,                           # population size
                               states = c("S", "I", "R"),                # compartment names
@@ -27,18 +27,19 @@ simulation_plot <- function(epimodel, orig_data, SEIR=FALSE){
                               meas_vars = "I",                                            # name of measurement variable
                               r_meas_process = r_meas_process,                            # measurement process functions
                               d_meas_process = d_meas_process)
-    
-    
+
+
     epimodel <- simulate_epimodel(epimodel = epimodel,
                                   lump = TRUE, trim = TRUE)
-    plot(x = epimodel$pop_mat[,"time"], y = epimodel$pop_mat[,"I"], "l", 
-         ylim = c(-5, 200), xlim=c(0, 65),xlab = "Time", ylab = "Prevalence")
-    lines(x=dat[, "time"], y=dat[, "I"], type='b')
-    legend(1, 200, legend=c("Simualted Cases", "Real Cases"), col=c("red", "blue"), lty=1:2, cex=0.8)
-    
-    
+    plot(x = epimodel$pop_mat[,"time"], y = epimodel$pop_mat[,"I"], "l",
+         ylim = c(-5, 200), xlim=c(0, 65),xlab = "Time", ylab = "Prevalence",
+         main="Comparison between Simulated SIR Model data and Real Data")
+    points(x=dat[, "time"], y=dat[, "I"])
+    legend(1, 200, legend=c("Simulated Cases", "Real Cases"), pch=c("-", "o"))
+
+
   }  else {
-    
+
     init_dist <- rnorm(4, c(0.99, 0.01, 0.01, 0.001) , 1e-4); init_dist <- abs(init_dist) / sum(abs(init_dist))
     epimodel <- init_epimodel(obstimes = seq(0, 100, by = 1),                             # vector of observation times
                               popsize = 2000,                                              # population size
@@ -59,16 +60,17 @@ simulation_plot <- function(epimodel, orig_data, SEIR=FALSE){
                               r_meas_process = r_meas_process,                            # measurement process functions
                               d_meas_process = d_meas_process
     )
-    
+
     epimodel <- simulate_epimodel(epimodel = epimodel,
                                   init_state = c(S = 1999, E = 0, I = 1, R = 0),
-                                  lump = TRUE, 
+                                  lump = TRUE,
                                   trim = TRUE)
     plot(x = epimodel$pop_mat[,"time"], y = epimodel$pop_mat[,"I"], "l",
-         ylim = c(-5, 200), xlim=c(0, 65),xlab = "Time", ylab = "Prevalence")
+         ylim = c(-5, 200), xlim=c(0, 65),xlab = "Time", ylab = "Prevalence",
+         main="Comparison between Simulated SEIR Model data and Real Data")
     points(x=orig_data[, "time"], y=orig_data[, "I"], main="Comparisn Plot")
-    
-    
+    legend(1, 200, legend=c("Simulated Cases", "Real Cases"), pch=c("-", "o"))
+
   }
-  
+
 }

@@ -5,7 +5,7 @@ require(BDAepimodel)
 
 
 best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100, thres=2e-5, pop_size=2000, suppress_img=FALSE){
-  #' Build models to obtain the model with the best parameters by updating the parameters 
+  #' Build models to obtain the model with the best parameters by updating the parameters
   #' from the average of the parameters of the current model and the model one step before
   #' Repeat the above step until the mean changes below the threshold
   #'
@@ -18,15 +18,17 @@ best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100,
   #' @param pop_size the size of the population
   #' @param suppress_img whether or not to supress the graph output
   #' @return model with the best parameters according to the algorithm
-  #' @export 
-  #' 
-  
+  #' @export
+  #'
+
   curr_iter = 1
+  store_epimodel = NULL
+  set.seed(52787)
   while (curr_iter < max_iter){
     beta = as.numeric(params["beta"])
     mu = as.numeric(params["mu"])
     rho = as.numeric(params["rho"])
-    
+
     if(!SEIR){
       print (paste0("Iteration ", curr_iter))
       init_dist <- MCMCpack::rdirichlet(1, c(9,0.5,0.1))
@@ -48,12 +50,11 @@ best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100,
                                 niter = niter,  # this was set to 100,000 in the paper
                                 save_params_every = 1,
                                 save_configs_every = 250, # this was set to 250 in the paper
-                                kernel = list(gibbs_SIR),
+                                kernel = list(gibbs_kernel_SIR),
                                 configs_to_redraw = 20, # this was set to 75 in the paper
                                 analytic_eigen = "SIR", # compute eigen decompositions and matrix inverses analytically
-                                ecctmc_method = "unif", # sample subject paths in interevent intervals via modified rejection sampling
-                                seed = 52787)   
-      
+                                ecctmc_method = "unif") # sample subject paths in interevent intervals via modified rejection sampling
+
       epimodel <- tryCatch({fit_epimodel(epimodel, monitor = FALSE)},
                            error=function(cond) {
                              message("Reinitialize model")
@@ -62,7 +63,7 @@ best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100,
                              return(NULL)
                            })
       # epimodel <- fit_epimodel(epimodel, monitor = FALSE)
-      
+
       if (!is.null(epimodel)){
         old_params = params
         old_beta = beta
@@ -72,20 +73,22 @@ best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100,
         if (abs(beta - old_beta) < thres) {
           epimodel$avg_params = params
           break
-        } 
+        } else{
+          store_epimodel = epimodel
+        }
       }
-      curr_iter = curr_iter + 1 
-      
+      curr_iter = curr_iter + 1
+
     } else {
-      
+
       print (paste0("Iteration ", curr_iter))
-      # if using SEIR model 
+      # if using SEIR model
       # initialize params
       gamma = as.numeric(params["gamma"])
-      
+
       # initial values for initial state parameters
       init_dist <- rnorm(4, c(0.99, 0.01, 0.01, 0.001) , 1e-4); init_dist <- abs(init_dist) / sum(abs(init_dist))
-      
+
       epimodel  <- init_epimodel(popsize = pop_size,                                                       # population size
                                  states = c("S", "E", "I", "R"),                                      # compartment names
                                  params = c(beta = abs(rnorm(1, beta, 1e-7)),                           # infectivity rate
@@ -103,31 +106,16 @@ best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100,
                                  initdist_prior = c(100, 0.1, 0.4, 0.01), ### Parameters for the dirichlet prior distribution for the initial state probs
                                  r_meas_process = r_meas_process,
                                  d_meas_process = d_meas_process)
-      
+
       epimodel <- init_settings(epimodel,
                                 niter = niter, # set to 100000 for the paper
-                                save_params_every = 1, 
+                                save_params_every = 1,
                                 save_configs_every = 20, # this was set to 250 for the chains run in the paper
                                 kernel = list(gibbs_kernel_SEIR),
                                 configs_to_redraw = 1, # this was set to 100 in the paper
                                 analytic_eigen = "SEIR", # compute eigen decompositions analytically
-                                ecctmc_method = "unif",  # sample paths in inter-event intervals via uniformization
-                                seed = 52787)
-      
-      # epimodel <- fit_epimodel(epimodel, monitor = FALSE)
-      # 
-      # 
-      # old_params = params
-      # old_beta = beta
-      # # print (epimodel$results$params)
-      # params = apply(epimodel$results$params, 2, get_avg)
-      # beta = params["beta"]
-      # if (abs(beta - old_beta) < thres) {
-      #   epimodel$avg_params = params
-      #   break
-      # } else {
-      #   curr_iter = curr_iter + 1
-      # }
+                                ecctmc_method = "unif")  # sample paths in inter-event intervals via uniformization)
+
       epimodel <- tryCatch({fit_epimodel(epimodel, monitor = FALSE)},
                            error=function(cond) {
                              message("Reinitialize model")
@@ -136,7 +124,7 @@ best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100,
                              return(NULL)
                            })
       # epimodel <- fit_epimodel(epimodel, monitor = FALSE)
-      
+
       if (!is.null(epimodel)){
         old_params = params
         old_beta = beta
@@ -147,25 +135,27 @@ best_parmas_finder <- function(params, dat, SEIR=FALSE, max_iter=100, niter=100,
           epimodel$avg_params = params
           break
         } else {
-          curr_iter = curr_iter + 1
+          store_epimodel = epimodel
         }
       }
+      curr_iter = curr_iter + 1
     }
   }
-  
+
   if (curr_iter >= 100 ) {
     print("Best params were not found, returning the last model...")
     return (epimodel)
   }
-  
+  else {
   if (!suppress_img){
     ts.plot(epimodel$results$params[,"beta"], ylab = expression(beta), main="Infectivity Rate")
     plot(hist(epimodel$results$params[,"mu"]), main = "Recovery Rate")
     plot(hist(epimodel$results$params[,"rho"]), main = "Binomial s/ ampling probability")
-    
+
     if (SEIR){plot(hist(epimodel$results$params[,"gamma"]), main = "Infectivity Rate")}
   }
 
-  
+
   return (epimodel)
+  }
 }
