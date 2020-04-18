@@ -278,7 +278,7 @@ In the following experiment, we used the population size of 2000 and initial val
 
 ![Simulated Data for SEIR and SIR Model](images/dist3.jpeg)
 
-We'd also like to note the SIR and SEIR seems to focus on different aspect of the infected people. The mean squared error for SEIR is 23.83 and the mean squared error for SIR is 36.87. The SEIR model has a better fit for earlier data, but it also indicates there will be a significant boost of the infected people around the 40th day; however, this situation did not happen in the real case, possibly because of the effective quanrantine order in place. The SIR model on the other hand, the parameter $\rho$ - the ratio of the people who are infected and also tested - seems to have a stronger influence on the simulation result at the early stage, but the case count plateaus in the long run. Judging by the data provided by Region of Waterloo, the number of infected people seems to fit the stochastic SIR model better.
+We'd also like to note the SIR and SEIR seem to focus on different aspect of the infected people. The mean squared error for SEIR is 23.83 and the mean squared error for SIR is 36.87. The SEIR model has a better fit for earlier data, but it also indicates there will be a significant boost of the infected people around the 40th day; however, this situation did not happen in the real case, possibly because of the effective quanrantine order in place. The SIR model on the other hand, the parameter $\rho$ - the ratio of the people who are infected and also tested - seems to have a stronger influence on the simulation result at the early stage, but the case count plateaus in the long run. Judging by the data provided by Region of Waterloo, the number of infected people seems to fit the stochastic SIR model better.
 
 # 4. Discussion
 Coming back to these three compartmental models respectively, first, the basic SIR model lays down a foundation for studying how COVID-19 evolves. It relies on the assumptions that the population is well-mixed and closed and individual characteristics of transmissibility and ability to recover are the same for all population. This model has a lot of room for improvement as it first oversimplifies the problem by only dividing the population into three groups in terms of two fixed parameters that are supposed to change due to externalities over time. Second, the initial inputs required for parameter estimation might bring in initial error that can affect the latter MLE. Moreover, this model does not converge to an disease-free equilibrium when R0is greater than 1. \bigskip
@@ -291,10 +291,7 @@ $$\frac{d}{dt}P(t) = \Lambda P(t), \ s.t. P(0) = I$$
 
 The $P = exp(t\Lambda)$ is the most intensive step in the algorithm, since it will calcuate $P$ for every partitioned time intervals. The research paper implemented a method to cache the result eigenvalues and eigenvectors, as the exponetialization of a matrix will be applied to the same rate matrix. Also, the method in this paper solves the problem that with absent data on the progression of the virus, the complicated latent variable can cause the state size to grow large when the population increases, by updating the subject-level paths. Since we have to track the all the subject-paths, the overall runtime will be negatively influenced by the computational overhead. The paper also states the MCMC algorithm is coded for reliability and MCMC mixing can be too slow in a large population for practical use. 
 
-The stochastic SEIR and SIR 
-
-
-One other drawback is we cannot find a set of suitable parameters with completely randomly generated parameters, we have to start with an educated guess which will at least give a non-zero probability after the initialization step.
+One other drawback is we cannot find a set of suitable parameters with completely randomly generated parameters, we have to start with an educated guess or empirical results which will at least give a non-zero probability after the initialization step.
 \newpage
 
 # 5. Appendices
